@@ -1,8 +1,9 @@
 package zombi_shooter.player;
 
-import zombi_shooter.player.Player;
-
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class Perk {
 
@@ -12,14 +13,21 @@ public abstract class Perk {
     private String deBuff;
     private Color color;
     private String symbol;
+    private List<String> abilityKeys;
 
-    public Perk(String name, String description, String buff, String deBuff, Color color, String symbol) {
+    public Perk(String name, String description, String buff, String deBuff, Color color, String symbol, String... abilityKey) {
         this.name = name;
         this.description = description;
         this.buff = buff;
         this.deBuff = deBuff;
         this.color = color;
         this.symbol = symbol;
+        this.abilityKeys = new ArrayList<>();
+        abilityKeys.addAll(Arrays.asList(abilityKey));
+    }
+
+    public void createAbilityPerk(String name, String description, String buff, String deBuff, Color color, String symbol, String... ability) {
+
     }
 
     public abstract void applyEffect(Player player);

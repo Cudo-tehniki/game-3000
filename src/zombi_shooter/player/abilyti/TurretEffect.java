@@ -50,10 +50,4 @@ public class TurretEffect {
         return System.currentTimeMillis() - startTime < duration;
     }
 
-    public void updateEffect(long lastAbilityTime, List<TurretEffect> turretEffects){
-        turretEffects.removeIf(turretEffect -> {
-            turretEffect.updateEffect(lastAbilityTime, turretEffects);
-            return !turretEffect.isActive();
-        });
-    }
 }
