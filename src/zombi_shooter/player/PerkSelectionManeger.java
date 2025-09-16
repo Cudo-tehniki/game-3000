@@ -1,5 +1,8 @@
 package zombi_shooter.player;
 
+import zombi_shooter.player.abilyti.Ability;
+import zombi_shooter.player.abilyti.AbilityManager;
+
 import java.awt.*;
 
 public class PerkSelectionManeger {
@@ -8,6 +11,7 @@ public class PerkSelectionManeger {
     private boolean isSelectionActive;
     private int selectedIndex;
     private boolean selectedConfirm;
+    private AbilityManager abilityManager;
 
     public PerkSelectionManeger() {
         this.availablePerks = new Perk[]{
@@ -30,10 +34,20 @@ public class PerkSelectionManeger {
         do {
             Perk secondSelectedPerk = availablePerks[(int) (Math.random() * availablePerks.length)];
             selectedPerks[1] = secondSelectedPerk;
+            acceptAbility(firstSelectedPerk);
+            acceptAbility(secondSelectedPerk);
         } while (selectedPerks[1] == selectedPerks[0]);
         this.isSelectionActive = true;
         this.selectedIndex = 0;
         this.selectedConfirm = false;
+    }
+
+    private void acceptAbility(Perk selected) {
+        if(selected.hasAbility() && abilityManager != null){
+            for(String k: selected.getAbilityKeys()){
+                abilityManager.addAbility(k);
+            }
+        }
     }
 
     public void handleKeyboardInput(int keyCode) {
@@ -132,5 +146,9 @@ public class PerkSelectionManeger {
 
     public Perk getSelectedPerk() {
         return selectedPerks[selectedIndex];
+    }
+
+    public void setAbilityManager(AbilityManager abilityManager) {
+        this.abilityManager = abilityManager;
     }
 }

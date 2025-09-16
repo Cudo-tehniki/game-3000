@@ -9,7 +9,7 @@ public class SurvivalistPerk extends Perk{
     private Weapon.WeaponType weaponType;
 
     public SurvivalistPerk() {
-        super("Survivalist", "Вы готовы ко всему", "spawn with SHOTGUN", "HP -80%", new Color(255, 235, 169), "⛏️");
+        super("Survivalist", "Вы готовы ко всему", "spawn with SHOTGUN", "HP -80%", new Color(255, 235, 169), "⛏️", "turret");
         weaponType = Weapon.WeaponType.SHOTGUN;
     }
 

@@ -230,5 +230,12 @@ public class AbilityManager {
     public void setChoosenAbility(Ability choosenAbility) {
         this.choosenAbility = choosenAbility;
     }
+
+    public void updatePlayerPosicion(int x, int y){
+        playerPosicion.setLocation(x, y);
+    }
+    public void updateMousePosicion(int x, int y){
+        mousePosicion.setLocation(x, y);
+    }
 }
 

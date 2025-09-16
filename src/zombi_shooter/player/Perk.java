@@ -26,6 +26,13 @@ public abstract class Perk {
         abilityKeys.addAll(Arrays.asList(abilityKey));
     }
 
+    public boolean hasAbility(){
+        if(!abilityKeys.isEmpty()){
+            return true;
+        }
+        return false;
+    }
+
     public void createAbilityPerk(String name, String description, String buff, String deBuff, Color color, String symbol, String... ability) {
 
     }
@@ -144,5 +151,9 @@ public abstract class Perk {
 
     public void setSymbol(String symbol) {
         this.symbol = symbol;
+    }
+
+    public List<String> getAbilityKeys() {
+        return abilityKeys;
     }
 }

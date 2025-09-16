@@ -1,6 +1,8 @@
 package zombi_shooter;
 
 import zombi_shooter.player.*;
+import zombi_shooter.player.abilyti.Ability;
+import zombi_shooter.player.abilyti.AbilityManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,6 +76,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     private int amountOfOpenSunduk = 0;
     private Sound sound;
     private PerkSelectionManeger perkSelectionManeger;
+    private AbilityManager abilityManager;
 
     public ZombieGame() {
         init();
@@ -88,6 +91,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         player.setBaseSpeed(5);
         camera = new Camera(player.getPositionX(), player.getPositionY(), WINDOW_WIDTH, WINDOW_HEIGHT);
         currentWeapon = new Weapon(Weapon.WeaponType.PISTOL);
+        abilityManager = new AbilityManager();
+        perkSelectionManeger.setAbilityManager(abilityManager);
 
         setFocusable(true);
         addKeyListener(this);
@@ -152,6 +157,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         player.draw(worldGrafic);
         drawWorldObj(worldGrafic);
         drawBorder(worldGrafic);
+        abilityManager.draw(worldGrafic);
+        abilityManager.drawUI(g2d, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         // НОВОЕ: Рисуем босса если он активен
         if (bossActive && boss != null) {
@@ -1039,7 +1046,11 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
                 }
                 gameRunning = true;
             }
-        }else {
+        } else if (abilityManager.handleKeyPress(keyCode)){
+            return;
+        }
+
+        else {
             if (keyCode == VK_W || keyCode == VK_UP) {
                 upPressed = true;
             }
@@ -1091,6 +1102,12 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     @Override
     public void actionPerformed(ActionEvent e) {
         updateGame();
+        if(!perkSelectionManeger.isSelectionActive()){
+            abilityManager.updatePlayerPosicion(player.getPositionX() + camera.getX(),
+                    player.getPositionY() + camera.getY());
+            abilityManager.updateMousePosicion(mouseX + camera.getX(), mouseY + camera.getY());
+            abilityManager.update(1000 / 60, listOfZomboits, listOfBullet);
+        }
         repaint();
     }
 
@@ -1110,6 +1127,9 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         if (SwingUtilities.isLeftMouseButton(e)) {
             shootBullet();
         }
+        if (SwingUtilities.isRightMouseButton(e)){
+            abilityManager.handleMouseClick(e);
+        }
     }
 
     @Override
@@ -1118,6 +1138,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
             shootBullet();
             mouseHeld = true;
         }
+        mouseClicked(e);
     }
 
     @Override

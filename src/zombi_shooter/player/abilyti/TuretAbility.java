@@ -5,6 +5,7 @@ import zombi_shooter.Zomboid;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TuretAbility implements Ability {
@@ -32,7 +33,7 @@ public class TuretAbility implements Ability {
     private Zomboid zomboid = null;
     private boolean showMuzzleFlash = false;
     private long muzzleFlashTime = 0;
-    private List<TurretEffect> turretEffects;
+    private List<TurretEffect> turretEffects = new ArrayList<>();
 
     @Override
     public boolean activate(int playerX, int playerY, int mouseX, int mouseY) {
