@@ -1,6 +1,5 @@
 package zombi_shooter.player;
 
-import zombi_shooter.player.abilyti.Ability;
 import zombi_shooter.player.abilyti.AbilityManager;
 
 import java.awt.*;
@@ -29,37 +28,54 @@ public class PerkSelectionManeger {
     }
 
     public void startSelectionRandomPerk() {
+        // Выбираем случайные перки
         Perk firstSelectedPerk = availablePerks[(int) (Math.random() * availablePerks.length)];
         selectedPerks[0] = firstSelectedPerk;
+        
         do {
             Perk secondSelectedPerk = availablePerks[(int) (Math.random() * availablePerks.length)];
             selectedPerks[1] = secondSelectedPerk;
-            acceptAbility(firstSelectedPerk);
-            acceptAbility(secondSelectedPerk);
         } while (selectedPerks[1] == selectedPerks[0]);
+        
+        // Активируем экран выбора
         this.isSelectionActive = true;
         this.selectedIndex = 0;
         this.selectedConfirm = false;
+        
+        // ВАЖНО: НЕ добавляем способности сразу, только после выбора игрока
+        System.out.println("Perk selection started. Available perks: " + 
+                          selectedPerks[0].getName() + ", " + selectedPerks[1].getName());
     }
 
     private void acceptAbility(Perk selected) {
         if(selected.hasAbility() && abilityManager != null){
             for(String k: selected.getAbilityKeys()){
-                abilityManager.addAbility(k);
+                boolean added = abilityManager.addAbility(k);
+                System.out.println("Added ability: " + k + ", success: " + added);
             }
         }
     }
 
     public void handleKeyboardInput(int keyCode) {
         if (isSelectionActive) {
+            System.out.println("Key pressed during perk selection: " + keyCode);
             switch (keyCode) {
-                case 37:
+                case java.awt.event.KeyEvent.VK_LEFT: // LEFT arrow
+                case java.awt.event.KeyEvent.VK_A:
                     selectedIndex = 0;
+                    System.out.println("Selected left perk: " + selectedPerks[0].getName());
                     break;
-                case 39:
+                case 39: // RIGHT arrow  
+                case java.awt.event.KeyEvent.VK_D:
                     selectedIndex = 1;
+                    System.out.println("Selected right perk: " + selectedPerks[1].getName());
                     break;
-                case 10:
+                case 10: // ENTER
+                // Removed duplicate case java.awt.event.KeyEvent.VK_ENTER
+                case java.awt.event.KeyEvent.VK_SPACE:
+                    System.out.println("Confirming perk selection: " + getSelectedPerk().getName());
+                    // ТЕПЕРЬ добавляем способности выбранного перка
+                    acceptAbility(getSelectedPerk());
                     selectedConfirm = true;
                     isSelectionActive = false;
                     break;
@@ -68,7 +84,11 @@ public class PerkSelectionManeger {
     }
 
     public void draw(Graphics2D g2d, int screenWidth, int screenHeight) {
-        if (!isSelectionActive) return;
+        if (!isSelectionActive) {
+            return;
+        }
+
+        System.out.println("Drawing perk selection screen");
 
         // Полупрозрачный фон
         g2d.setColor(new Color(0, 0, 0, 180));
@@ -98,12 +118,20 @@ public class PerkSelectionManeger {
         int cardY = (screenHeight - cardHeight) / 2;
 
         for (int i = 0; i < 2; i++) {
-            int cardX = startX + i * (cardWidth + cardSpacing);
-            boolean isSelected = (i == selectedIndex);
-            selectedPerks[i].drawCard(g2d, cardX, cardY, cardWidth, cardHeight, isSelected);
+            if (selectedPerks[i] != null) {
+                int cardX = startX + i * (cardWidth + cardSpacing);
+                boolean isSelected = (i == selectedIndex);
+                selectedPerks[i].drawCard(g2d, cardX, cardY, cardWidth, cardHeight, isSelected);
+            }
         }
+
+        // Дополнительная отладочная информация
+        g2d.setColor(Color.YELLOW);
+        g2d.setFont(new Font("Arial", Font.PLAIN, 12));
+        g2d.drawString("Selected: " + selectedIndex + " | Confirm: " + selectedConfirm, 10, screenHeight - 20);
     }
 
+    // Getters and setters
     public Perk[] getAvailablePerks() {
         return availablePerks;
     }
@@ -145,7 +173,10 @@ public class PerkSelectionManeger {
     }
 
     public Perk getSelectedPerk() {
-        return selectedPerks[selectedIndex];
+        if (selectedPerks != null && selectedIndex >= 0 && selectedIndex < selectedPerks.length) {
+            return selectedPerks[selectedIndex];
+        }
+        return null;
     }
 
     public void setAbilityManager(AbilityManager abilityManager) {

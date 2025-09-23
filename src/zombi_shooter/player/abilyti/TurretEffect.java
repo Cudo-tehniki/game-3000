@@ -1,7 +1,6 @@
 package zombi_shooter.player.abilyti;
 
 import java.awt.*;
-import java.util.List;
 
 public class TurretEffect {
     public static final int SMOKE = 1;

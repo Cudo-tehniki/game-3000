@@ -1,7 +1,6 @@
 package zombi_shooter;
 
 import zombi_shooter.player.*;
-import zombi_shooter.player.abilyti.Ability;
 import zombi_shooter.player.abilyti.AbilityManager;
 
 import javax.swing.*;
@@ -38,8 +37,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     private boolean hordWarning = false;
     private long hordWarningTime = 0;
     private int HORDE_DURACION = 0;
-    private String[] duracionName = {"", "сверху", "справа", "снизу", "слева"};
-    private String[] arrowsDuracion = {"", "⬆️", "➡️", "⬇️", "⬅️"};
+    private String[] duracionName = { "", "сверху", "справа", "снизу", "слева" };
+    private String[] arrowsDuracion = { "", "⬆️", "➡️", "⬇️", "⬅️" };
     private Player player;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -87,7 +86,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         perkSelectionManeger.startSelectionRandomPerk();
         setBackground(BACKGROUND);
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-        player = new Player(100,MAP_WIDTH / 2, MAP_HEIGHT / 2);
+        player = new Player(100, MAP_WIDTH / 2, MAP_HEIGHT / 2);
         player.setBaseSpeed(5);
         camera = new Camera(player.getPositionX(), player.getPositionY(), WINDOW_WIDTH, WINDOW_HEIGHT);
         currentWeapon = new Weapon(Weapon.WeaponType.PISTOL);
@@ -116,10 +115,6 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         initAchievement();
 
         sound = new Sound();
-        sound.loadSound("background", "C:\\project_java\\Test 234\\Test 234\\Test 234\\src\\zombi_shooter\\music\\background.wav");
-        sound.loadSound("hitZomb", "C:\\project_java\\Test 234\\Test 234\\Test 234\\src\\zombi_shooter\\music\\hit.wav");
-        sound.loadSound("shoot", "C:\\project_java\\Test 234\\Test 234\\Test 234\\src\\zombi_shooter\\music\\shoot.wav");
-        sound.playBackgroudMusic("background");
 
         timer = new Timer(1000 / 60, this);
         timer.start();
@@ -145,7 +140,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        if(perkSelectionManeger.isSelectionActive()){
+        if (perkSelectionManeger.isSelectionActive()) {
             perkSelectionManeger.draw(g2d, WINDOW_WIDTH, WINDOW_HEIGHT);
             return;
         }
@@ -213,7 +208,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         g2d.drawString("Weapon: " + currentWeapon.getName(), 10, 125);
         g2d.drawString("Ammo: " + currentWeapon.getAmmo() + "/" + currentWeapon.getMaxAmmo(), 10, 145);
         g2d.drawString("Total Ammo: " + totalAmmo, 10, 165);
-        if (perkSelectionManeger.getSelectedPerk() != null){
+        if (perkSelectionManeger.getSelectedPerk() != null) {
             g2d.drawString("Perk: " + perkSelectionManeger.getSelectedPerk().getName(), 10, 240);
         }
 
@@ -338,7 +333,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         achievementList.add(achievement3);
     }
 
-    private void  checkAchievement() {
+    private void checkAchievement() {
         for (Achievement a : achievementList) {
             if (!unlockedAchievement.contains(a.getId())) {
                 boolean unlocked = false;
@@ -353,7 +348,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
                         unlocked = currentLevel >= a.getRequirement();
                         break;
                 }
-                if (unlocked){
+                if (unlocked) {
                     unlockAchievement(a);
                 }
             }
@@ -377,7 +372,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
                 }
 
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-                g2d.setColor(new Color(255, 215, 0, (int)(255 * alpha))); // Золотой цвет
+                g2d.setColor(new Color(255, 215, 0, (int) (255 * alpha))); // Золотой цвет
                 g2d.setFont(new Font("Arial", Font.BOLD, 20));
 
                 FontMetrics fm = g2d.getFontMetrics();
@@ -447,23 +442,23 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         switch (HORDE_DURACION) {
             case 1: // Сверху
                 g2d.drawLine(centerX, centerY - size + 5, centerX, centerY - 8);
-                g2d.fillPolygon(new int[]{centerX - 3, centerX + 3, centerX},
-                        new int[]{centerY - 5, centerY - 5, centerY - 8}, 3);
+                g2d.fillPolygon(new int[] { centerX - 3, centerX + 3, centerX },
+                        new int[] { centerY - 5, centerY - 5, centerY - 8 }, 3);
                 break;
             case 2: // Справа
                 g2d.drawLine(centerX + size - 5, centerY, centerX + 8, centerY);
-                g2d.fillPolygon(new int[]{centerX + 5, centerX + 5, centerX + 8},
-                        new int[]{centerY - 3, centerY + 3, centerY}, 3);
+                g2d.fillPolygon(new int[] { centerX + 5, centerX + 5, centerX + 8 },
+                        new int[] { centerY - 3, centerY + 3, centerY }, 3);
                 break;
             case 3: // Снизу
                 g2d.drawLine(centerX, centerY + size - 5, centerX, centerY + 8);
-                g2d.fillPolygon(new int[]{centerX - 3, centerX + 3, centerX},
-                        new int[]{centerY + 5, centerY + 5, centerY + 8}, 3);
+                g2d.fillPolygon(new int[] { centerX - 3, centerX + 3, centerX },
+                        new int[] { centerY + 5, centerY + 5, centerY + 8 }, 3);
                 break;
             case 4: // Слева
                 g2d.drawLine(centerX - size + 5, centerY, centerX - 8, centerY);
-                g2d.fillPolygon(new int[]{centerX - 5, centerX - 5, centerX - 8},
-                        new int[]{centerY - 3, centerY + 3, centerY}, 3);
+                g2d.fillPolygon(new int[] { centerX - 5, centerX - 5, centerX - 8 },
+                        new int[] { centerY - 3, centerY + 3, centerY }, 3);
                 break;
         }
 
@@ -512,8 +507,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         // Создаем босса подальше от игрока
         double distanceToPlayer = Math.sqrt(
                 Math.pow(player.getPositionX() - x, 2) +
-                        Math.pow(player.getPositionY() - y, 2)
-        );
+                        Math.pow(player.getPositionY() - y, 2));
 
         if (distanceToPlayer < 200) {
             // Если слишком близко, создаем в случайном месте
@@ -560,8 +554,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         // Проверяем, чтобы сундук не появился слишком близко к игроку
         double distanceToPlayer = Math.sqrt(
                 Math.pow(player.getPositionX() - x, 2) +
-                        Math.pow(player.getPositionY() - y, 2)
-        );
+                        Math.pow(player.getPositionY() - y, 2));
 
         if (distanceToPlayer > 100) { // Минимальное расстояние от игрока
             Chest chest = new Chest(x, y);
@@ -570,7 +563,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     }
 
     public void updateGame() {
-        if (!gameRunning) return;
+        if (!gameRunning)
+            return;
 
         // НОВОЕ: Обработка завершения уровня
         if (levelCompleted) {
@@ -775,7 +769,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
                     itteradetListOfBullet.remove();
                     score += 10;
                     zombiesKilled++;// НОВОЕ: Увеличиваем счетчик убитых зомби
-                    if(perkSelectionManeger.getSelectedPerk() instanceof RedKlinokPerk){
+                    if (perkSelectionManeger.getSelectedPerk() instanceof RedKlinokPerk) {
                         player.setPlayerHealth(Math.min(player.getMaxHealth(), player.getPlayerHealth() + 1));
                     }
                     break;
@@ -789,8 +783,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         if (bossActive && boss != null) {
             double distanceToBoss = Math.sqrt(
                     Math.pow(player.getPositionX() - boss.getX(), 2) +
-                            Math.pow(player.getPositionY() - boss.getY(), 2)
-            );
+                            Math.pow(player.getPositionY() - boss.getY(), 2));
             if (distanceToBoss < (BOSS_SIZE / 2 + 15)) { // Размер игрока + размер босса
                 player.setPlayerHealth(player.getPlayerHealth() - boss.getDamage());
                 if (player.getPlayerHealth() <= 0) {
@@ -804,8 +797,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         for (Zomboid zomb : listOfZomboits) {
             double distance = Math.sqrt(
                     Math.pow(player.getPositionX() - zomb.getX(), 2) +
-                            Math.pow(player.getPositionY() - zomb.getY(), 2)
-            );
+                            Math.pow(player.getPositionY() - zomb.getY(), 2));
             if (distance < 25) { // Размер игрока + размер зомби
                 player.setPlayerHealth(player.getPlayerHealth() - 1); // Урон от зомби
                 if (player.getPlayerHealth() <= 0) {
@@ -904,8 +896,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
                     player.getDirection(),
                     currentWeapon.getBulletSpeed(),
                     currentWeapon.getDamage(),
-                    currentWeapon.getBulletColor()
-            );
+                    currentWeapon.getBulletColor());
 
             listOfBullet.add(bullet);
             sound.playSound("shoot");
@@ -981,8 +972,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         amountOfOpenSunduk = 0;
 
         player.setBaseHp();
-        player.setPositionX(MAP_WIDTH/2);
-        player.setPositionY(MAP_HEIGHT/2);
+        player.setPositionX(MAP_WIDTH / 2);
+        player.setPositionY(MAP_HEIGHT / 2);
         player.setBaseSpeed(5);
         camera.setPosition(player.getPositionX(), player.getPositionY());
         currentWeapon = new Weapon(Weapon.WeaponType.PISTOL);
@@ -1022,7 +1013,12 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
 
         perkSelectionManeger = new PerkSelectionManeger();
         perkSelectionManeger.startSelectionRandomPerk();
-        if (sound != null){
+        
+        // Сбрасываем AbilityManager и устанавливаем связь
+        abilityManager.cleanUp();
+        perkSelectionManeger.setAbilityManager(abilityManager);
+        
+        if (sound != null) {
             sound.playBackgroudMusic("background");
         }
     }
@@ -1034,23 +1030,49 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        if (!gameRunning && perkSelectionManeger.isSelectionActive()){
+
+        // ПЕРВАЯ ПРОВЕРКА: если активен экран выбора перков
+        if (perkSelectionManeger.isSelectionActive()) {
+            System.out.println("Handling perk selection input: " + keyCode);
             perkSelectionManeger.handleKeyboardInput(keyCode);
-            if(perkSelectionManeger.isSelectedConfirm()){
+
+            // Проверяем, подтвердил ли игрок выбор
+            if (perkSelectionManeger.isSelectedConfirm()) {
                 Perk selectedPerk = perkSelectionManeger.getSelectedPerk();
-                selectedPerk.applyEffect(player);
-                if (selectedPerk instanceof SurvivalistPerk){
-                    SurvivalistPerk survPerk = (SurvivalistPerk) selectedPerk;
-                    Weapon weapon = new Weapon(survPerk.getWeaponType());
-                    currentWeapon = weapon;
+                if (selectedPerk != null) {
+                    System.out.println("Applying perk: " + selectedPerk.getName());
+                    selectedPerk.applyEffect(player);
+
+                    // Применяем специальные эффекты перков
+                    if (selectedPerk instanceof SurvivalistPerk) {
+                        SurvivalistPerk survPerk = (SurvivalistPerk) selectedPerk;
+                        Weapon weapon = new Weapon(survPerk.getWeaponType());
+                        currentWeapon = weapon;
+                    }
+
+                    // ЗАПУСКАЕМ ИГРУ
+                    gameRunning = true;
+                    System.out.println("Game started!");
                 }
-                gameRunning = true;
             }
-        } else if (abilityManager.handleKeyPress(keyCode)){
+            return; // Важно! Выходим из метода, чтобы не обрабатывать другие клавиши
+        }
+
+        // ВТОРАЯ ПРОВЕРКА: если игра не запущена, но перки не активны - перезапуск
+        if (!gameRunning && !perkSelectionManeger.isSelectionActive()) {
+            if (keyCode == VK_R) {
+                restartGame();
+                return;
+            }
+        }
+
+        // ТРЕТЬЯ ПРОВЕРКА: обработка способностей во время игры
+        if (gameRunning && abilityManager.handleKeyPress(keyCode)) {
             return;
         }
 
-        else {
+        // ОБЫЧНОЕ УПРАВЛЕНИЕ ИГРОЙ
+        if (gameRunning) {
             if (keyCode == VK_W || keyCode == VK_UP) {
                 upPressed = true;
             }
@@ -1069,17 +1091,13 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
             if (keyCode == VK_E) {
                 openNearestChest();
             }
-            if (keyCode == VK_R && !gameRunning) {
-                restartGame();
-            }
-            if (keyCode == VK_R && gameRunning) {
+            if (keyCode == VK_R) {
                 // Ручная перезарядка
                 reloadFromTotalAmmo();
             }
         }
+
         repaint();
-
-
     }
 
     @Override
@@ -1102,7 +1120,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     @Override
     public void actionPerformed(ActionEvent e) {
         updateGame();
-        if(!perkSelectionManeger.isSelectionActive()){
+        if (!perkSelectionManeger.isSelectionActive()) {
             abilityManager.updatePlayerPosicion(player.getPositionX() + camera.getX(),
                     player.getPositionY() + camera.getY());
             abilityManager.updateMousePosicion(mouseX + camera.getX(), mouseY + camera.getY());
@@ -1127,7 +1145,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         if (SwingUtilities.isLeftMouseButton(e)) {
             shootBullet();
         }
-        if (SwingUtilities.isRightMouseButton(e)){
+        if (SwingUtilities.isRightMouseButton(e)) {
             abilityManager.handleMouseClick(e);
         }
     }
