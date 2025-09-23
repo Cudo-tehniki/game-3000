@@ -29,7 +29,10 @@ public class AbilityManager {
         Ability ability = abilities.get(idAbility);
         if (ability != null) {
             activeAbility.add(ability);
+            System.out.println("Successfully added ability: " + idAbility + ". Total active abilities: " + activeAbility.size());
             return true;
+        } else {
+            System.out.println("Failed to add ability: " + idAbility + " (not found in abilities map)");
         }
         return false;
     }
@@ -48,17 +51,27 @@ public class AbilityManager {
     }
 
     public boolean selectAbility(int indexKey) {
-        if (indexKey > 0 && indexKey < activeAbility.size()) {
+        System.out.println("Selecting ability with key: " + indexKey + ", activeAbilities count: " + activeAbility.size());
+        if (indexKey > 0 && indexKey <= activeAbility.size()) {
             choosenAbility = activeAbility.get(indexKey - 1);
+            System.out.println("Selected ability: " + choosenAbility.getName());
             return true;
         }
+        System.out.println("Failed to select ability - index out of range");
         return false;
     }
 
     public boolean activeAbility() {
         if (choosenAbility != null) {
             boolean activate = choosenAbility.activate(playerPosicion.x, playerPosicion.y, mousePosicion.x, mousePosicion.y);
-            if (activate) {
+            System.out.println("Attempting to activate ability: " + choosenAbility.getName() + ", result: " + activate);
+            if (activate && choosenAbility instanceof TuretAbility) {
+                TuretAbility turret = (TuretAbility) choosenAbility;
+                // Для турели не сбрасываем выбор, пока она не размещена
+                if (turret.isPlaced()) {
+                    choosenAbility = null;
+                }
+            } else if (activate) {
                 choosenAbility = null;
             }
             return activate;
@@ -79,29 +92,50 @@ public class AbilityManager {
 
     public boolean handleMouseClick(MouseEvent mouseEvent) {
         mousePosicion.setLocation(mouseEvent.getX(), mouseEvent.getY());
-        if (mouseEvent.getButton() == MouseEvent.BUTTON2 && choosenAbility != null) {
+        System.out.println("Mouse clicked: button=" + mouseEvent.getButton() + ", chosen ability=" + (choosenAbility != null ? choosenAbility.getName() : "null"));
+        if (mouseEvent.getButton() == MouseEvent.BUTTON3 && choosenAbility != null) {
+            System.out.println("Activating ability with right mouse click");
             return activeAbility();
         }
         return false;
     }
 
     public void update(long lastAbilityTime, List<Zomboid> zomboidList, List<Bullet> bulletList) {
+        System.out.println("AbilityManager.update() - activeAbilities count: " + activeAbility.size());
         for (Ability a : activeAbility) {
             a.update(lastAbilityTime, zomboidList, bulletList);
         }
-        activeAbility.removeIf(a -> {
-            if (!a.isActive() && a != choosenAbility) {
-                a.cleanUp();
-                return true;
+        // Для турелей: когда время жизни истекает, сбрасываем их состояние, но не удаляем
+        for (Ability a : activeAbility) {
+            if (a instanceof TuretAbility) {
+                TuretAbility turret = (TuretAbility) a;
+                // Если турель была размещена, но больше не активна (время истекло)
+                if (turret.isPlaced() && !turret.isActive()) {
+                    System.out.println("Resetting expired turret for cooldown");
+                    turret.resetForCooldown(); // Новый метод для сброса состояния
+                }
             }
-            return false;
-        });
+        }
+        // Больше не удаляем турели автоматически - они остаются для показа кулдауна
     }
 
     public void draw(Graphics2D graphics2D){
         for(Ability a: activeAbility){
-            a.draw(graphics2D);
+            if (a == choosenAbility && a.isActive() && !placed(a)) {
+                a.draw(graphics2D, mousePosicion.x, mousePosicion.y);
+            } else {
+                a.draw(graphics2D);
+            }
         }
+    }
+    
+    private boolean placed(Ability ability) {
+        if (ability instanceof TuretAbility) {
+            TuretAbility turret = (TuretAbility) ability;
+            // Нужно добавить геттер для placed в TuretAbility
+            return turret.isPlaced();
+        }
+        return true; // для других способностей считаем размещенными
     }
 
     public void drawUI(Graphics2D g2d, int windowWidth, int windowHeight) {

@@ -37,9 +37,11 @@ public class TuretAbility implements Ability {
 
     @Override
     public boolean activate(int playerX, int playerY, int mouseX, int mouseY) {
+        System.out.println("TuretAbility.activate() called. isReady: " + isReady() + ", isActive: " + isActive + ", placed: " + placed);
         if (isReady()) {
             if (!isActive && !placed) {
                 isActive = true;
+                System.out.println("Turret activation mode enabled");
                 return true;
             }
             if (isActive && !placed) {
@@ -48,6 +50,7 @@ public class TuretAbility implements Ability {
                 placed = true;
                 activationTime = System.currentTimeMillis();
                 lastActivacion = System.currentTimeMillis();
+                System.out.println("Turret placed at: " + turretX + ", " + turretY);
                 return true;
             }
         }
@@ -65,11 +68,14 @@ public class TuretAbility implements Ability {
                 zomboid = zomb;
             }
         }
+        if (zomboid != null) {
+            System.out.println("Turret found target: zombie at (" + zomboid.getX() + ", " + zomboid.getY() + "), distance: " + minDistant);
+        }
     }
 
     public void updateEffect(long lastAbilityTime){
         turretEffects.removeIf(turretEffect -> {
-            updateEffect(lastAbilityTime);
+            turretEffect.update(lastAbilityTime);
             return !turretEffect.isActive();
         });
     }
@@ -81,7 +87,9 @@ public class TuretAbility implements Ability {
         }
         long currentTime = System.currentTimeMillis();
         if(currentTime - activationTime > TIME_DURACION){
-            cleanUp();
+            // Время истекло - турель больше не функционирует, но не сбрасываем placed
+            // Это позволит AbilityManager удалить турель из списка
+            System.out.println("Turret time expired");
             return;
         }
         updateEffect(lastAbilityTime);
@@ -119,8 +127,10 @@ public class TuretAbility implements Ability {
         double gunTipY = turretY + Math.sin(gunRotation) * (SIZE * 0.6);
 
         Bullet bullet = new Bullet((int)gunTipX, (int)gunTipY,
-                Math.cos(gunRotation), (int) Math.sin(gunRotation), DMG, Color.ORANGE);
+                gunRotation, 8, DMG, Color.ORANGE);  // Используем gunRotation как направление и скорость 8
         listOfBullet.add(bullet);
+        
+        System.out.println("Turret shooting at angle: " + gunRotation + " towards zombie at (" + zomboid.getX() + ", " + zomboid.getY() + ")");
 
         // Эффекты выстрела
         showMuzzleFlash = true;
@@ -132,20 +142,55 @@ public class TuretAbility implements Ability {
 
     @Override
     public void draw(Graphics2D g2d) {
+        // Рисуем турель только если она размещена и время не истекло
+        if (!placed) {
+            return; // Не размещена или на кулдауне - не рисуем
+        }
+        
+        // Проверяем, что время жизни не истекло
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - activationTime > TIME_DURACION) {
+            return; // Время истекло - не рисуем
+        }
+
+        // Рисуем радиус действия
+        g2d.setColor(new Color(0, 255, 0, 30));
+        g2d.fillOval((int) (turretX - TURRET_RANGE), (int) (turretY - TURRET_RANGE),
+                (int) (TURRET_RANGE * 2), (int) (TURRET_RANGE * 2));
+
+        // Рисуем турель
+        drawTurretBody(g2d, turretX, turretY, gunRotation);
+
+        // Рисуем эффекты
+        for (TurretEffect effect : turretEffects) {
+            effect.draw(g2d);
+        }
+
+        // Индикатор времени жизни
+        drawLifeIndicator(g2d);
+    }
+
+    @Override
+    public void draw(Graphics2D g2d, int mouseX, int mouseY) {
+        // Не рисуем ничего, если турель на кулдауне (не готова и не размещена)
+        if (!placed && !isReady()) {
+            return; // На кулдауне - не показываем предпросмотр
+        }
+        
         if (!isActive) return;
 
         if (!placed) {
             // Показываем радиус размещения при выборе места
-            g2d.setColor(HIGHT_LIGHT_COLOR);
-            g2d.fillOval((int) (turretX - TURRET_RANGE), (int) (turretY - TURRET_RANGE),
+            g2d.setColor(new Color(HIGHT_LIGHT_COLOR.getRed(), HIGHT_LIGHT_COLOR.getGreen(), HIGHT_LIGHT_COLOR.getBlue(), 50));
+            g2d.fillOval((int) (mouseX - TURRET_RANGE), (int) (mouseY - TURRET_RANGE),
                     (int) (TURRET_RANGE * 2), (int) (TURRET_RANGE * 2));
             g2d.setColor(Color.YELLOW);
-            g2d.drawOval((int) (turretX - TURRET_RANGE), (int) (turretY - TURRET_RANGE),
+            g2d.drawOval((int) (mouseX - TURRET_RANGE), (int) (mouseY - TURRET_RANGE),
                     (int) (TURRET_RANGE * 2), (int) (TURRET_RANGE * 2));
 
             // Рисуем предпросмотр турели
             g2d.setColor(new Color(255, 255, 255, 150));
-            drawTurretBody(g2d, turretX, turretY, 0);
+            drawTurretBody(g2d, mouseX, mouseY, 0);
 
             return;
         }
@@ -250,10 +295,18 @@ public class TuretAbility implements Ability {
 
     @Override
     public boolean isActive() {
-        if(placed || isActive){
-            return true;
+        // Турель считается "активной" для UI если:
+        // 1. Она не размещена (доступна для размещения) 
+        // 2. Она размещена и время жизни не истекло
+        // 3. Она на кулдауне (чтобы показывать время перезарядки)
+        if (!placed) {
+            return true; // Доступна для использования или на кулдауне
+        } else {
+            // Размещена - проверяем время жизни
+            long currentTime = System.currentTimeMillis();
+            boolean timeNotExpired = currentTime - activationTime <= TIME_DURACION;
+            return timeNotExpired;
         }
-        return false;
     }
 
     @Override
@@ -273,10 +326,11 @@ public class TuretAbility implements Ability {
 
     @Override
     public long getRemaingCoudown() {
-        if (!isActive()){
-            return getCouldown() - (System.currentTimeMillis() - lastActivacion);
+        if (isReady()) {
+            return 0; // Готова к использованию
         }
-        return 0;
+        long remaining = getCouldown() - (System.currentTimeMillis() - lastActivacion);
+        return Math.max(0, remaining); // Не возвращаем отрицательные значения
     }
 
     @Override
@@ -294,5 +348,20 @@ public class TuretAbility implements Ability {
         zomboid = null;
         turretEffects.clear();
         showMuzzleFlash = false;
+    }
+    
+    public void resetForCooldown() {
+        // Сбрасываем состояние турели для начала кулдауна, но сохраняем lastActivacion
+        isActive = false;
+        placed = false;
+        zomboid = null;
+        turretEffects.clear();
+        showMuzzleFlash = false;
+        // lastActivacion НЕ сбрасываем - он нужен для расчета кулдауна
+        System.out.println("Turret reset for cooldown. Last activation: " + lastActivacion);
+    }
+    
+    public boolean isPlaced() {
+        return placed;
     }
 }

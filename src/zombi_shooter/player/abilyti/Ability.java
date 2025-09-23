@@ -11,6 +11,7 @@ public interface Ability {
     boolean activate(int playerX, int playerY, int mouseX, int mouseY);
     void update(long lastAbilityTime, List<Zomboid> listOfZomb, List<Bullet> listOfBullet);
     void draw(Graphics2D g2d);
+    void draw(Graphics2D g2d, int mouseX, int mouseY);
     boolean isActive();
     String getName();
     String description();
