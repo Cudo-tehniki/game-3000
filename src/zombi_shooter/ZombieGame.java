@@ -83,6 +83,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
 
     private void init() {
         perkSelectionManeger = new PerkSelectionManeger();
+        perkSelectionManeger.setAbilityManager(abilityManager);
         perkSelectionManeger.startSelectionRandomPerk();
         setBackground(BACKGROUND);
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -91,8 +92,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         camera = new Camera(player.getPositionX(), player.getPositionY(), WINDOW_WIDTH, WINDOW_HEIGHT);
         currentWeapon = new Weapon(Weapon.WeaponType.PISTOL);
         abilityManager = new AbilityManager();
-        perkSelectionManeger.setAbilityManager(abilityManager);
-
+        
         setFocusable(true);
         addKeyListener(this);
         addMouseListener(this);

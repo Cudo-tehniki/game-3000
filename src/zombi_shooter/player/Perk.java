@@ -3,6 +3,7 @@ package zombi_shooter.player;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class Perk {
@@ -24,6 +25,7 @@ public abstract class Perk {
         this.symbol = symbol;
         this.abilityKeys = new ArrayList<>();
         abilityKeys.addAll(Arrays.asList(abilityKey));
+
     }
 
     public boolean hasAbility(){
