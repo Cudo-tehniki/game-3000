@@ -10,7 +10,7 @@ public class MapGenerator {
     private static final Color GRASS_COLOR = new Color(0, 150, 0);
     private static final Color DARK_GRASS_COLOR = new Color(0, 100, 0);
     private static final Color ROAD_COLOR = new Color(50, 50, 50);
-    private static final Color TREE_COLOR = new Color(0, 180, 0);
+    private static final Color TREE_COLOR = new Color(45, 255, 0);
     private static final Color ROCK_COLOR = new Color(100, 100, 100);
 
     private BufferedImage mapImage;
@@ -28,6 +28,7 @@ public class MapGenerator {
         this.roads = new ArrayList<>();
         this.trees = new ArrayList<>();
         this.rocks = new ArrayList<>();
+        generateMap();
     }
 
     public void drawGrassBackground(Graphics2D g2d) {
@@ -76,5 +77,131 @@ public class MapGenerator {
                 10.0f, new float[]{20.0f, 20.0f}, 0.0f));
         g2d.drawLine(0, roadY, mapWidth, roadY);
         g2d.drawLine(roadX, 0, roadX, mapHeight);
+    }
+
+    public void drawTree(Graphics2D g2d, int x, int y) {
+        g2d.setColor(new Color(101, 67, 33));
+        g2d.fillRect(x - 3, y - 5, 6, 15);
+        g2d.setColor(TREE_COLOR);
+        g2d.fillOval(x - 12, y - 25, 24, 24);
+        g2d.setColor(new Color(0, 0, 0, 30));
+        g2d.fillOval(x - 8, y + 8, 16, 8);
+        g2d.setColor(new Color(50, 150, 50));
+        g2d.fillOval(x - 8, y - 16, 16, 16);
+    }
+
+    public void drawRock(Graphics2D g2d, int x, int y) {
+        int size = 5 + random.nextInt(15);
+        g2d.setColor(ROCK_COLOR);
+        g2d.fillOval(x - size / 2, y - size / 2, size + 3, size);
+        g2d.setColor(new Color(150, 150, 150));
+        g2d.fillOval(x - size / 3, y - size / 3, (size + 3) / 2, size / 2);
+        g2d.setColor(new Color(0, 0, 0, 30));
+        g2d.fillOval(x - size / 4, y - size / 3, (size + 3) / 2, size / 4);
+    }
+
+    public void generateRocks(Graphics2D g2d) {
+        for (int i = 0; i < 30; i++) {
+            int x = random.nextInt(mapWidth);
+            int y = random.nextInt(mapHeight);
+            if (!checkIsOnRoad(x, y)) {
+                drawRock(g2d, x, y);
+                rocks.add(new Point(x, y));
+            }
+        }
+    }
+
+    public void generateTrees(Graphics2D g2d) {
+        for (int i = 0; i < 70; i++) {
+            int x = random.nextInt(mapWidth);
+            int y = random.nextInt(mapHeight);
+            if (!checkIsOnRoad(x, y)) {
+                drawTree(g2d, x, y);
+                trees.add(new Point(x, y));
+            }
+        }
+    }
+
+    public boolean checkIsOnRoad(int x, int y) {
+        for (Rectangle r : roads) {
+            if (r.contains(x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void addTexture(Graphics2D g2d) {
+        for (int i = 0; i < mapWidth * mapHeight / 200; i++) {
+            int x = random.nextInt(mapWidth);
+            int y = random.nextInt(mapHeight);
+
+            if (checkIsOnRoad(x, y)) continue;
+
+            int red = Math.max(0, Math.min(255, GRASS_COLOR.getRed() + random.nextInt(40) - 20));
+            int green = Math.max(0, Math.min(255, GRASS_COLOR.getGreen() + random.nextInt(40) - 20));
+            int blue = Math.max(0, Math.min(255, GRASS_COLOR.getBlue() + random.nextInt(20) - 10));
+
+            Color textureColor = new Color(red, green, blue, 100);
+
+            g2d.setColor(textureColor);
+            g2d.fillRect(x, y, 1, 1);
+        }
+    }
+
+
+    public void draw(Graphics2D g2d, int offsetX, int offsetY, int viewWidth, int viewHeight) {
+        int startX = Math.max(0, offsetX);
+        int startY = Math.max(0, offsetY);
+        int endX = Math.min(mapWidth, offsetX + viewWidth);
+        int endY = Math.min(mapHeight, offsetY + viewHeight);
+
+        if (startX < endX && startY < endY) {
+            BufferedImage subImage = mapImage.getSubimage(
+                    startX, startY, endX - startX, endY - startY
+            );
+            g2d.drawImage(subImage, startX - offsetX, startY - offsetY, null);
+        }
+    }
+
+    public void generateMap() {
+        mapImage = new BufferedImage(mapWidth, mapHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = mapImage.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        drawGrassBackground(g2d);
+        addGrassVariation(g2d);
+        generateRoads(g2d);
+        generateRocks(g2d);
+        generateTrees(g2d);
+        addTexture(g2d);
+        g2d.dispose();
+    }
+
+    public BufferedImage getMapImage() {
+        return mapImage;
+    }
+
+    public int getMapWidth() {
+        return mapWidth;
+    }
+
+    public int getMapHeight() {
+        return mapHeight;
+    }
+
+    public Random getRandom() {
+        return random;
+    }
+
+    public List<Rectangle> getRoads() {
+        return roads;
+    }
+
+    public List<Point> getTrees() {
+        return trees;
+    }
+
+    public List<Point> getRocks() {
+        return rocks;
     }
 }

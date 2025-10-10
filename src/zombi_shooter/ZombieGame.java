@@ -1,5 +1,6 @@
 package zombi_shooter;
 
+import zombi_shooter.map.MapGenerator;
 import zombi_shooter.player.*;
 import zombi_shooter.player.abilyti.AbilityManager;
 
@@ -21,8 +22,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     private final int ZOMBI_SPAWN_DELAY = 5000;
     private final int CHEST_SPAWN_DELAY = 10000;
     private final int HORDE_SPAWN_DELAY = 6000;
-    private final int MIN_HORDE_ZOMB = 15;
-    private final int MAX_HORDE_ZOMB = 30;
+    private final int MIN_HORDE_ZOMB = 50;
+    private final int MAX_HORDE_ZOMB = 100;
     private final int WARNING_DURACION = 3000;
     // НОВЫЕ НАСТРОЙКИ УРОВНЕЙ (легко конфигурируемые)
     private final int ZOMBIES_TO_KILL_FOR_BOSS = 50; // Сколько зомби нужно убить для появления босса
@@ -76,6 +77,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     private Sound sound;
     private PerkSelectionManeger perkSelectionManeger;
     private AbilityManager abilityManager;
+    private MapGenerator mapGenerator;
 
     public ZombieGame() {
         init();
@@ -90,6 +92,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         player = new Player(100, MAP_WIDTH / 2, MAP_HEIGHT / 2);
         player.setBaseSpeed(5);
         camera = new Camera(player.getPositionX(), player.getPositionY(), WINDOW_WIDTH, WINDOW_HEIGHT);
+        mapGenerator = new MapGenerator(MAP_WIDTH, MAP_HEIGHT);
         currentWeapon = new Weapon(Weapon.WeaponType.PISTOL);
         abilityManager = new AbilityManager();
         
@@ -115,6 +118,11 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         initAchievement();
 
         sound = new Sound();
+        sound.loadSound("background", "C:\\project_java\\megaGame3000\\src\\zombi_shooter\\music\\backgroundByCudoTehniki.wav");
+        sound.loadSound("hitZomb", "C:\\project_java\\Test 234\\Test 234\\Test 234\\src\\zombi_shooter\\music\\hit.wav");
+        sound.loadSound("shoot", "C:\\project_java\\Test 234\\Test 234\\Test 234\\src\\zombi_shooter\\music\\shoot.wav");
+        sound.playBackgroudMusic("background");
+
 
         timer = new Timer(1000 / 60, this);
         timer.start();
@@ -148,6 +156,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         // Применяем трансформацию камеры
         Graphics2D worldGrafic = (Graphics2D) g2d.create();
         worldGrafic.translate(-camera.getX(), -camera.getY());
+
+        mapGenerator.draw(worldGrafic, 0, 0, MAP_WIDTH, MAP_HEIGHT);
 
         player.draw(worldGrafic);
         drawWorldObj(worldGrafic);
@@ -288,6 +298,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
 
         drawAchievementNotification(g2d);
     }
+
+
 
     private void drawHordeWarning(Graphics2D g2d, long timeLeft) {
         long currentTime = System.currentTimeMillis();
