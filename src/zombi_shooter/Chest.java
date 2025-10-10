@@ -2,7 +2,7 @@ package zombi_shooter;
 
 import java.awt.*;
 
-class Chest {
+public class Chest {
     private final int SIZE = 30;
     private final Color CLOSED_COLOR = new Color(139, 69, 19); // Коричневый цвет
     private final Color OPEN_COLOR = new Color(205, 133, 63);  // Светло-коричневый
