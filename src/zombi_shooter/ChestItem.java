@@ -70,6 +70,26 @@ public class ChestItem {
             return createScoreBonus(scoreBonus);
         }
     }
+    public static ChestItem generateRandomItem(int luckyMultiplayer){
+        int random = (int) (Math.random() * 100);
+
+        if (random < 50) {
+            // 50% - оружие
+            return createWeapon(Weapon.getWeaponWithLuck(luckyMultiplayer));
+        } else if (random < 70) {
+            // 20% - патроны
+            int ammoAmount = 20 + (int) (Math.random() * 31) + luckyMultiplayer; // 20-50 патронов
+            return createAmmo(ammoAmount);
+        } else if (random < 85) {
+            // 15% - здоровье
+            int healthAmount = 25 + (int) (Math.random() * 26) +  luckyMultiplayer; // 25-50 здоровья
+            return createHealth(healthAmount);
+        } else {
+            // 15% - бонус очков
+            int scoreBonus = 100 + (int) (Math.random() * 201) + luckyMultiplayer * 10; // 100-300 очков
+            return createScoreBonus(scoreBonus);
+        }
+    }
 
     public void draw(Graphics2D g2d, int x, int y) {
         // Рисуем иконку предмета

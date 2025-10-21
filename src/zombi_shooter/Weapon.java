@@ -88,6 +88,18 @@ public class Weapon {
         else return WeaponType.SNIPER;                  // 5%
     }
 
+    public static WeaponType getWeaponWithLuck(int playerLuck) {
+        // Система редкости: чем выше редкость, тем меньше шанс выпадения
+        int random = (int) (Math.random() * 100);
+        random += playerLuck / 2;
+
+        if (random < 40) return WeaponType.PISTOL;     // 40%
+        else if (random < 65) return WeaponType.RIFLE;  // 25%
+        else if (random < 80) return WeaponType.SHOTGUN; // 15%
+        else if (random < 95) return WeaponType.MACHINE_GUN; // 15%
+        else return WeaponType.SNIPER;                  // 5%
+    }
+
     // Геттеры
     public WeaponType getType() { return type; }
     public int getAmmo() { return ammo; }

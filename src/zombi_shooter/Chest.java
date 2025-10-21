@@ -24,6 +24,15 @@ public class Chest {
         this.item = ChestItem.generateRandomItem(); // Генерируем случайный предмет
     }
 
+    public Chest(int x, int y, int luckyMultiplayer) {
+        this.x = x;
+        this.y = y;
+        this.isOpen = false;
+        this.canOpen = false;
+        this.itemTaken = false;
+        this.item = ChestItem.generateRandomItem(luckyMultiplayer); // Генерируем случайный предмет
+    }
+
     public void draw(Graphics2D g2d) {
         // Основной корпус сундука
         g2d.setColor(isOpen ? OPEN_COLOR : CLOSED_COLOR);

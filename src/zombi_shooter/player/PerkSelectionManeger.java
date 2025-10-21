@@ -16,7 +16,7 @@ public class PerkSelectionManeger {
         this.availablePerks = new Perk[]{
                 new TankPerk(),
                 new ScoutPerk(),
-                new ChancePerk(),
+                new LuckyPerk(),
                 new SurvivalistPerk(),
                 new RedKlinokPerk()
         };

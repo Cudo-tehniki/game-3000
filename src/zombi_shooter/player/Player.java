@@ -11,6 +11,7 @@ public class Player {
     private int positionY;
     private int positionX;
     private double direction = 0;
+    private int luckyMultiplayer = 0;
 
     public Player(int positionX, int positionY) {
         this.positionX = positionX;
@@ -123,5 +124,13 @@ public class Player {
 
     public void setBaseHp(){
         setMaxHealth(100);
+    }
+
+    public int getLuckyMultiplayer() {
+        return luckyMultiplayer;
+    }
+
+    public void setLuckyMultiplayer(int luckyMultiplayer) {
+        this.luckyMultiplayer = luckyMultiplayer;
     }
 }

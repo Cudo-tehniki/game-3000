@@ -1,6 +1,7 @@
 package zombi_shooter;
 
 import zombi_shooter.map.MapGenerator;
+import zombi_shooter.map.MiniMap;
 import zombi_shooter.player.*;
 import zombi_shooter.player.abilyti.AbilityManager;
 
@@ -78,6 +79,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     private PerkSelectionManeger perkSelectionManeger;
     private AbilityManager abilityManager;
     private MapGenerator mapGenerator;
+    private MiniMap miniMap;
 
     public ZombieGame() {
         init();
@@ -93,6 +95,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         player.setBaseSpeed(5);
         camera = new Camera(player.getPositionX(), player.getPositionY(), WINDOW_WIDTH, WINDOW_HEIGHT);
         mapGenerator = new MapGenerator(MAP_WIDTH, MAP_HEIGHT);
+        miniMap = new MiniMap(MAP_WIDTH, MAP_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, mapGenerator);
         currentWeapon = new Weapon(Weapon.WeaponType.PISTOL);
         abilityManager = new AbilityManager();
         
@@ -174,6 +177,9 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
 
         // Рисуем UI поверх всего
         drawUI(g2d);
+        if(gameRunning){
+            miniMap.draw(g2d, listOfZomboits, listOfChests, player, boss, bossActive);
+        }
     }
 
     private void drawBorder(Graphics2D g2d) {
@@ -569,7 +575,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
                         Math.pow(player.getPositionY() - y, 2));
 
         if (distanceToPlayer > 100) { // Минимальное расстояние от игрока
-            Chest chest = new Chest(x, y);
+            Chest chest = new Chest(x, y, player.getLuckyMultiplayer());
             listOfChests.add(chest);
         }
     }
@@ -1029,6 +1035,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         // Сбрасываем AbilityManager и устанавливаем связь
         abilityManager.cleanUp();
         perkSelectionManeger.setAbilityManager(abilityManager);
+        miniMap = new MiniMap(MAP_WIDTH, MAP_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, mapGenerator);
         
         if (sound != null) {
             sound.playBackgroudMusic("background");
