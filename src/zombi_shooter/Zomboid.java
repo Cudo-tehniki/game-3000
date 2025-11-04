@@ -64,7 +64,12 @@ public class Zomboid {
             lastY = y;
             x += moveX;
             y += moveY;
-            animationTime += 0.3;
+            animationTime += 0.4;
+            if (animationTime > Math.PI * 2) {
+                animationTime -= Math.PI * 2;
+            }
+        } else {
+            animationTime += 0.1;
             if (animationTime > Math.PI * 2) {
                 animationTime -= Math.PI * 2;
             }
@@ -75,48 +80,56 @@ public class Zomboid {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
         double sinWave = Math.sin(animationTime);
+        double cosWave = Math.cos(animationTime);
         
         Color baseColor = COLOR_OF_ZOMBOID;
         Color darkerColor = new Color(
-            Math.max(0, baseColor.getRed() - 40),
-            Math.max(0, baseColor.getGreen() - 40),
-            Math.max(0, baseColor.getBlue() - 40)
+            Math.max(0, baseColor.getRed() - 50),
+            Math.max(0, baseColor.getGreen() - 50),
+            Math.max(0, baseColor.getBlue() - 50)
         );
         Color headColor = new Color(
-            Math.max(0, baseColor.getRed() - 60),
-            Math.max(0, baseColor.getGreen() - 60),
-            Math.max(0, baseColor.getBlue() - 60)
+            Math.max(0, baseColor.getRed() - 80),
+            Math.max(0, baseColor.getGreen() - 80),
+            Math.max(0, baseColor.getBlue() - 80)
+        );
+        Color darkestColor = new Color(
+            Math.max(0, baseColor.getRed() - 100),
+            Math.max(0, baseColor.getGreen() - 100),
+            Math.max(0, baseColor.getBlue() - 100)
         );
         
-        int headSize = (int) (size * 0.45);
-        int bodyWidth = (int) (size * 0.65);
-        int bodyHeight = (int) (size * 1.1);
+        int headSize = (int) (size * 0.5);
+        int bodyWidth = (int) (size * 0.7);
+        int bodyHeight = (int) (size * 1.2);
         
-        double bodySway = sinWave * 2;
-        double headBob = Math.abs(sinWave) * 1.5;
-        double armSwing = sinWave * 8;
-        double legSwing = sinWave * 6;
+        double bodySway = sinWave * 3;
+        double headBob = Math.abs(sinWave) * 2;
+        double armSwing = sinWave * 12;
+        double legSwing = sinWave * 10;
         
         int shadowX = x;
-        int shadowY = y + size / 2;
-        g2d.setColor(new Color(0, 0, 0, 80));
-        g2d.fillOval(shadowX - size / 3, shadowY - size / 8, (int)(size * 0.7), size / 4);
+        int shadowY = y + size / 2 + 2;
+        g2d.setColor(new Color(0, 0, 0, 100));
+        g2d.fillOval(shadowX - size / 2, shadowY - size / 6, size, size / 3);
         
         int centerX = x;
         int centerY = y;
         
         g2d.translate(centerX, centerY);
-        g2d.rotate(bodySway * 0.05);
+        g2d.rotate(bodySway * 0.08);
         
         int bodyX = 0;
-        int bodyY = (int)(-headSize * 0.3 + headBob);
+        int bodyY = (int)(-headSize * 0.25 + headBob);
         
         g2d.setColor(darkerColor);
         g2d.fillOval(bodyX - bodyWidth / 2, bodyY, bodyWidth, bodyHeight);
         
-        g2d.setColor(new Color(80, 0, 0));
-        g2d.setStroke(new BasicStroke(2f));
+        g2d.setColor(darkestColor);
+        g2d.setStroke(new BasicStroke(2.5f));
         g2d.drawOval(bodyX - bodyWidth / 2, bodyY, bodyWidth, bodyHeight);
+        
+        drawCrackNetwork(g2d, bodyX - bodyWidth / 2, bodyY, bodyWidth, bodyHeight, darkestColor);
         
         int headX = bodyX;
         int headY = bodyY - headSize / 2;
@@ -124,83 +137,141 @@ public class Zomboid {
         g2d.setColor(headColor);
         g2d.fillOval(headX - headSize / 2, headY, headSize, headSize);
         
-        g2d.setColor(new Color(60, 60, 60));
-        g2d.setStroke(new BasicStroke(2f));
+        g2d.setColor(darkestColor);
+        g2d.setStroke(new BasicStroke(2.5f));
         g2d.drawOval(headX - headSize / 2, headY, headSize, headSize);
         
-        int armBaseY = bodyY + headSize / 4;
-        int armWidth = size / 5;
-        int armLength = (int)(size * 0.7);
+        drawCrackNetwork(g2d, headX - headSize / 2, headY, headSize, headSize, darkestColor);
         
-        double leftArmSwing = armSwing;
-        double rightArmSwing = -armSwing;
+        int armBaseY = bodyY + headSize / 5;
+        int armWidth = size / 4;
+        int armLength = (int)(size * 0.75);
         
-        int leftArmX = (int)(-bodyWidth / 2 - armWidth / 2 + Math.sin(leftArmSwing * 0.1) * 3);
-        int rightArmX = (int)(bodyWidth / 2 - armWidth / 2 + Math.sin(rightArmSwing * 0.1) * 3);
-        int leftArmY = (int)(armBaseY - armLength / 2 + Math.cos(leftArmSwing * 0.1) * 5);
-        int rightArmY = (int)(armBaseY - armLength / 2 + Math.cos(rightArmSwing * 0.1) * 5);
+        double leftArmAngle = Math.toRadians(armSwing);
+        double rightArmAngle = Math.toRadians(-armSwing);
+        
+        int leftArmX = (int)(-bodyWidth / 2 - armWidth / 2 + Math.sin(leftArmAngle) * armWidth);
+        int rightArmX = (int)(bodyWidth / 2 - armWidth / 2 + Math.sin(rightArmAngle) * armWidth);
+        int leftArmY = (int)(armBaseY - armLength / 2 + Math.cos(leftArmAngle) * 8);
+        int rightArmY = (int)(armBaseY - armLength / 2 + Math.cos(rightArmAngle) * 8);
         
         g2d.setColor(baseColor);
         g2d.fillOval(leftArmX, leftArmY, armWidth, armLength);
         g2d.fillOval(rightArmX, rightArmY, armWidth, armLength);
         
-        int legBaseY = bodyY + bodyHeight;
-        int legWidth = size / 6;
-        int legLength = (int)(size * 0.55);
+        g2d.setColor(darkestColor);
+        g2d.setStroke(new BasicStroke(1.5f));
+        g2d.drawOval(leftArmX, leftArmY, armWidth, armLength);
+        g2d.drawOval(rightArmX, rightArmY, armWidth, armLength);
         
-        int leftLegOffset = (int)(legSwing * 0.8);
-        int rightLegOffset = (int)(-legSwing * 0.8);
+        drawCrackNetwork(g2d, leftArmX, leftArmY, armWidth, armLength, darkestColor);
+        drawCrackNetwork(g2d, rightArmX, rightArmY, armWidth, armLength, darkestColor);
+        
+        int legBaseY = bodyY + bodyHeight;
+        int legWidth = size / 5;
+        int legLength = (int)(size * 0.6);
+        int footWidth = (int)(legWidth * 1.8);
+        int footHeight = legWidth / 2;
+        
+        int leftLegOffset = (int)(legSwing * 1.2);
+        int rightLegOffset = (int)(-legSwing * 1.2);
+        
+        int leftLegX = -size / 5 + leftLegOffset;
+        int rightLegX = size / 5 + rightLegOffset;
         
         g2d.setColor(baseColor);
-        g2d.fillOval(-size / 5 + leftLegOffset - legWidth / 2, legBaseY, legWidth, legLength);
-        g2d.fillOval(size / 5 + rightLegOffset - legWidth / 2, legBaseY, legWidth, legLength);
+        g2d.fillOval(leftLegX - legWidth / 2, legBaseY, legWidth, legLength);
+        g2d.fillOval(rightLegX - legWidth / 2, legBaseY, legWidth, legLength);
         
-        g2d.rotate(-bodySway * 0.05);
+        g2d.setColor(darkestColor);
+        g2d.setStroke(new BasicStroke(1.5f));
+        g2d.drawOval(leftLegX - legWidth / 2, legBaseY, legWidth, legLength);
+        g2d.drawOval(rightLegX - legWidth / 2, legBaseY, legWidth, legLength);
+        
+        g2d.setColor(darkerColor);
+        g2d.fillOval(leftLegX - footWidth / 2, legBaseY + legLength - footHeight / 2, footWidth, footHeight);
+        g2d.fillOval(rightLegX - footWidth / 2, legBaseY + legLength - footHeight / 2, footWidth, footHeight);
+        
+        g2d.setColor(darkestColor);
+        g2d.setStroke(new BasicStroke(1.5f));
+        g2d.drawOval(leftLegX - footWidth / 2, legBaseY + legLength - footHeight / 2, footWidth, footHeight);
+        g2d.drawOval(rightLegX - footWidth / 2, legBaseY + legLength - footHeight / 2, footWidth, footHeight);
+        
+        drawCrackNetwork(g2d, leftLegX - legWidth / 2, legBaseY, legWidth, legLength, darkestColor);
+        drawCrackNetwork(g2d, rightLegX - legWidth / 2, legBaseY, legWidth, legLength, darkestColor);
+        
+        g2d.setColor(new Color(140, 0, 0));
+        int woundSize = Math.max(4, size / 8);
+        g2d.fillOval(bodyX - bodyWidth / 3, bodyY + bodyHeight / 4, woundSize, woundSize);
+        g2d.fillOval(bodyX + bodyWidth / 4, bodyY + bodyHeight / 2, woundSize, woundSize);
+        g2d.fillOval(bodyX - bodyWidth / 6, bodyY + bodyHeight * 0.7, woundSize, woundSize);
+        g2d.fillOval(bodyX + bodyWidth / 3, bodyY + bodyHeight / 3, woundSize, woundSize);
+        
+        g2d.rotate(-bodySway * 0.08);
         g2d.translate(-centerX, -centerY);
         
         int eyeY = headY + headSize / 4;
-        int eyeSize = Math.max(4, size / 7);
-        int eyeSpacing = size / 7;
+        int eyeSize = Math.max(5, size / 6);
+        int eyeSpacing = size / 6;
         
-        g2d.setColor(new Color(0, 255, 0, 220));
+        g2d.setColor(new Color(0, 255, 0, 240));
         g2d.fillOval(headX - eyeSpacing - eyeSize / 2, eyeY, eyeSize, eyeSize);
         g2d.fillOval(headX + eyeSpacing - eyeSize / 2, eyeY, eyeSize, eyeSize);
         
         g2d.setColor(Color.BLACK);
-        int pupilSize = Math.max(3, eyeSize / 2);
-        int pupilOffset = (int)(Math.sin(animationTime * 0.5) * 1);
+        int pupilSize = Math.max(4, eyeSize / 2);
+        int pupilOffset = (int)(Math.sin(animationTime * 0.7) * 2);
         g2d.fillOval(headX - eyeSpacing - pupilSize / 2 + pupilOffset, eyeY, pupilSize, pupilSize);
         g2d.fillOval(headX + eyeSpacing - pupilSize / 2 + pupilOffset, eyeY, pupilSize, pupilSize);
         
-        int mouthY = headY + headSize * 0.6;
-        int mouthWidth = (int)(size * 0.3);
-        int mouthHeight = size / 10;
+        int mouthY = headY + headSize * 0.65;
+        int mouthWidth = (int)(size * 0.35);
+        int mouthHeight = size / 8;
         
-        g2d.setColor(new Color(10, 10, 10));
+        g2d.setColor(new Color(5, 5, 5));
         g2d.fillOval(headX - mouthWidth / 2, mouthY, mouthWidth, mouthHeight);
         
         g2d.setColor(Color.WHITE);
-        int toothSize = Math.max(2, size / 14);
-        for (int i = 0; i < 4; i++) {
-            int toothX = headX - mouthWidth / 2 + (i + 1) * (mouthWidth / 5);
-            g2d.fillRect(toothX - toothSize / 2, mouthY, toothSize, toothSize + 1);
-        }
-        
-        g2d.setColor(new Color(120, 0, 0));
-        int woundSize = Math.max(3, size / 9);
-        g2d.fillOval(bodyX - bodyWidth / 3, bodyY + bodyHeight / 4, woundSize, woundSize);
-        g2d.fillOval(bodyX + bodyWidth / 4, bodyY + bodyHeight / 2, woundSize, woundSize);
-        g2d.fillOval(bodyX - bodyWidth / 6, bodyY + bodyHeight * 0.7, woundSize, woundSize);
-        
-        g2d.setColor(new Color(60, 0, 0));
-        g2d.setStroke(new BasicStroke(1f));
-        for (int i = 0; i < 3; i++) {
-            int scratchX = bodyX - bodyWidth / 3 + i * (bodyWidth / 3);
-            int scratchY = bodyY + bodyHeight / 3 + i * 3;
-            g2d.drawLine(scratchX, scratchY, scratchX + 4, scratchY + 4);
+        int toothSize = Math.max(3, size / 12);
+        for (int i = 0; i < 5; i++) {
+            int toothX = headX - mouthWidth / 2 + (i + 1) * (mouthWidth / 6);
+            g2d.fillRect(toothX - toothSize / 2, mouthY, toothSize, toothSize + 2);
         }
         
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+    }
+    
+    private void drawCrackNetwork(Graphics2D g2d, int x, int y, int width, int height, Color crackColor) {
+        g2d.setColor(new Color(crackColor.getRed(), crackColor.getGreen(), crackColor.getBlue(), 180));
+        g2d.setStroke(new BasicStroke(1f));
+        
+        int centerX = x + width / 2;
+        int centerY = y + height / 2;
+        
+        for (int i = 0; i < 8; i++) {
+            double angle = (i * Math.PI * 2) / 8 + animationTime * 0.1;
+            int startX = centerX;
+            int startY = centerY;
+            int endX = (int)(centerX + Math.cos(angle) * (width / 2 + height / 2) / 2);
+            int endY = (int)(centerY + Math.sin(angle) * (width / 2 + height / 2) / 2);
+            
+            if (endX >= x && endX <= x + width && endY >= y && endY <= y + height) {
+                g2d.drawLine(startX, startY, endX, endY);
+            }
+        }
+        
+        for (int i = 0; i < 5; i++) {
+            int crackX = x + (int)(Math.random() * width);
+            int crackY = y + (int)(Math.random() * height);
+            int crackLength = (int)(Math.min(width, height) * 0.3);
+            double crackAngle = Math.random() * Math.PI * 2;
+            int crackEndX = (int)(crackX + Math.cos(crackAngle) * crackLength);
+            int crackEndY = (int)(crackY + Math.sin(crackAngle) * crackLength);
+            
+            if (crackEndX >= x && crackEndX <= x + width && crackEndY >= y && crackEndY <= y + height) {
+                g2d.drawLine(crackX, crackY, crackEndX, crackEndY);
+            }
+        }
     }
 
     public void drawHpBar(Graphics2D g2d) {
