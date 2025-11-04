@@ -4,6 +4,7 @@ import zombi_shooter.map.MapGenerator;
 import zombi_shooter.map.MiniMap;
 import zombi_shooter.player.*;
 import zombi_shooter.player.abilyti.AbilityManager;
+import zombi_shooter.enemy.EnemyType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,11 +21,11 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     private static final int MAP_WIDTH = 2000;
     private static final int MAP_HEIGHT = 1500;
     private static final Color BACKGROUND = new Color(43, 124, 0);
-    private final int ZOMBI_SPAWN_DELAY = 5000;
+    private final int ZOMBI_SPAWN_DELAY = 8000;
     private final int CHEST_SPAWN_DELAY = 10000;
-    private final int HORDE_SPAWN_DELAY = 6000;
-    private final int MIN_HORDE_ZOMB = 50;
-    private final int MAX_HORDE_ZOMB = 100;
+    private final int HORDE_SPAWN_DELAY = 15000;
+    private final int MIN_HORDE_ZOMB = 15;
+    private final int MAX_HORDE_ZOMB = 30;
     private final int WARNING_DURACION = 3000;
     // НОВЫЕ НАСТРОЙКИ УРОВНЕЙ (легко конфигурируемые)
     private final int ZOMBIES_TO_KILL_FOR_BOSS = 50; // Сколько зомби нужно убить для появления босса
@@ -108,7 +109,6 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         listOfChests = new ArrayList<>();
 
         // Создаем начальных зомби
-        createZombie();
         createZombie();
         createZombie();
 
@@ -541,6 +541,44 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         listOfZomboits.clear();
     }
 
+    private java.util.List<EnemyType> getEnemyTypesForLevel(int level) {
+        java.util.List<EnemyType> types = new ArrayList<>();
+        switch (level) {
+            case 1:
+                types.add(EnemyType.MELEE_ZOMBIE);
+                break;
+            case 2:
+                types.add(EnemyType.MELEE_ZOMBIE);
+                types.add(EnemyType.POISON_ZOMBIE);
+                break;
+            case 3:
+                types.add(EnemyType.MELEE_ZOMBIE);
+                types.add(EnemyType.POISON_ZOMBIE);
+                types.add(EnemyType.FIRE_ZOMBIE);
+                break;
+            case 4:
+                types.add(EnemyType.POISON_ZOMBIE);
+                types.add(EnemyType.FIRE_ZOMBIE);
+                types.add(EnemyType.TANK_ZOMBIE);
+                break;
+            default:
+                types.add(EnemyType.MELEE_ZOMBIE);
+                types.add(EnemyType.POISON_ZOMBIE);
+                types.add(EnemyType.FIRE_ZOMBIE);
+                types.add(EnemyType.TANK_ZOMBIE);
+        }
+        return types;
+    }
+
+    private EnemyType getRandomEnemyTypeForLevel(int level) {
+        java.util.List<EnemyType> availableTypes = getEnemyTypesForLevel(level);
+        if (availableTypes.isEmpty()) {
+            return EnemyType.MELEE_ZOMBIE;
+        }
+        int randomIndex = (int) (Math.random() * availableTypes.size());
+        return availableTypes.get(randomIndex);
+    }
+
     private void createZombie() {
         int x;
         int y;
@@ -562,7 +600,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
                 y = (int) (Math.random() * MAP_HEIGHT);
                 x = -50;
         }
-        Zomboid zomboid = new Zomboid(x, y);
+        EnemyType enemyType = getRandomEnemyTypeForLevel(currentLevel);
+        Zomboid zomboid = new Zomboid(x, y, enemyType);
         listOfZomboits.add(zomboid);
     }
 
@@ -648,7 +687,6 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         bossActive = false;
         boss = null;
 
-        createZombie();
         createZombie();
         createZombie();
 
@@ -825,7 +863,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
                     Math.pow(player.getPositionX() - zomb.getX(), 2) +
                             Math.pow(player.getPositionY() - zomb.getY(), 2));
             if (distance < 25) { // Размер игрока + размер зомби
-                player.setPlayerHealth(player.getPlayerHealth() - 1); // Урон от зомби
+                player.setPlayerHealth(player.getPlayerHealth() - zomb.getDmg());
                 if (player.getPlayerHealth() <= 0) {
                     gameRunning = false;
                 }
@@ -887,7 +925,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
                 x = 0;
                 y = 0;
         }
-        Zomboid zomboid = new Zomboid(Color.orange, x, y);
+        EnemyType enemyType = getRandomEnemyTypeForLevel(currentLevel);
+        Zomboid zomboid = new Zomboid(x, y, enemyType);
         listOfZomboits.add(zomboid);
     }
 
@@ -1029,7 +1068,6 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         mouseY = 0;
         mouseX = 0;
 
-        createZombie();
         createZombie();
         createZombie();
 
