@@ -133,4 +133,8 @@ public class Player {
     public void setLuckyMultiplayer(int luckyMultiplayer) {
         this.luckyMultiplayer = luckyMultiplayer;
     }
+
+    public int getSize() {
+        return size;
+    }
 }

@@ -98,7 +98,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         miniMap = new MiniMap(MAP_WIDTH, MAP_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, mapGenerator);
         currentWeapon = new Weapon(Weapon.WeaponType.PISTOL);
         abilityManager = new AbilityManager();
-        
+
         setFocusable(true);
         addKeyListener(this);
         addMouseListener(this);
@@ -125,6 +125,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         sound.loadSound("hitZomb", "C:\\project_java\\Test 234\\Test 234\\Test 234\\src\\zombi_shooter\\music\\hit.wav");
         sound.loadSound("shoot", "C:\\project_java\\Test 234\\Test 234\\Test 234\\src\\zombi_shooter\\music\\shoot.wav");
         sound.playBackgroudMusic("background");
+
 
 
         timer = new Timer(1000 / 60, this);
@@ -602,8 +603,15 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         // НОВОЕ: Обновляем босса или обычных зомби
         if (bossActive && boss != null) {
             boss.update(player.getPositionX(), player.getPositionY());
+            if(boss.isPlayerHit(player.getPositionX(), player.getPositionY(), player.getSize())){
+                player.setPlayerHealth(player.getPlayerHealth() - boss.getAbilityDmg());
+            }
         } else {
             updateZombi();
+        }
+
+        if(player.getPlayerHealth() <= 0){
+            gameRunning = false;
         }
 
         updateChests();
@@ -1031,12 +1039,12 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
 
         perkSelectionManeger = new PerkSelectionManeger();
         perkSelectionManeger.startSelectionRandomPerk();
-        
+
         // Сбрасываем AbilityManager и устанавливаем связь
         abilityManager.cleanUp();
         perkSelectionManeger.setAbilityManager(abilityManager);
         miniMap = new MiniMap(MAP_WIDTH, MAP_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, mapGenerator);
-        
+
         if (sound != null) {
             sound.playBackgroudMusic("background");
         }
