@@ -28,7 +28,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     private final int MAX_HORDE_ZOMB = 30;
     private final int WARNING_DURACION = 3000;
     // НОВЫЕ НАСТРОЙКИ УРОВНЕЙ (легко конфигурируемые)
-    private final int ZOMBIES_TO_KILL_FOR_BOSS = 50; // Сколько зомби нужно убить для появления босса
+    private final int ZOMBIES_TO_KILL_FOR_BOSS = 5; // Сколько зомби нужно убить для появления босса
     private final int BOSS_HEALTH = 100; // Здоровье босса
     private final int BOSS_SIZE = 60; // Размер босса
     private final int BOSS_SPEED = 2; // Скорость босса
@@ -95,7 +95,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         player = new Player(100, MAP_WIDTH / 2, MAP_HEIGHT / 2);
         player.setBaseSpeed(5);
         camera = new Camera(player.getPositionX(), player.getPositionY(), WINDOW_WIDTH, WINDOW_HEIGHT);
-        mapGenerator = new MapGenerator(MAP_WIDTH, MAP_HEIGHT);
+        mapGenerator = new MapGenerator(MAP_WIDTH, MAP_HEIGHT, currentLevel);
         miniMap = new MiniMap(MAP_WIDTH, MAP_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, mapGenerator);
         currentWeapon = new Weapon(Weapon.WeaponType.PISTOL);
         abilityManager = new AbilityManager();
@@ -683,6 +683,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
 
     private void startNextLevel() {
         currentLevel++;
+        mapGenerator.generateMap(currentLevel);
         zombiesKilled = 0;
         bossActive = false;
         boss = null;
@@ -693,6 +694,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         player.setPlayerHealth(Math.min(player.getMaxHealth(), player.getPlayerHealth() + 20));
 
         totalAmmo += 50;
+
     }
 
     private void updateChests() {
@@ -1025,6 +1027,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     }
 
     private void restartGame() {
+        mapGenerator.generateMap(1);
         gameRunning = false;
         levelCompleted = false;
         bossActive = false;

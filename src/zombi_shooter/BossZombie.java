@@ -16,6 +16,9 @@ public class BossZombie {
     private List<BossAbility> bossAbilities;
     private long lastAbilityTime = 0;
     private int cooldown = 3000;
+    private int lastTargetX;
+    private int lastTargetY;
+    private int lastTargetTime;
 
 
     private int x;
@@ -101,6 +104,9 @@ public class BossZombie {
                 BossAbility bossAbility = new BossAbility(ability, targetX, targetY, damage);
                 bossAbilities.add(bossAbility);
                 lastAbilityTime = time;
+                lastTargetX = targetX;
+                lastTargetY = targetY;
+                lastTargetTime = (int) time;
             }
         }
     }
@@ -140,12 +146,20 @@ public class BossZombie {
     }
 
     public void draw(Graphics2D g2d) {
+        boolean prepareAbility = isPrepareAbility();
+        long time = System.currentTimeMillis();
+        if (time - lastTargetTime < 1500 && lastTargetTime > 0) {
+            drawTargetLine(g2d, lastTargetX, lastTargetY, time - lastTargetTime);
+        }
+        if(prepareAbility){
+            drawAttackIndicator(g2d);
+        }
         // Рисуем тень под боссом
         g2d.setColor(new Color(0, 0, 0, 100));
         g2d.fillOval(x - size / 2 + 3, y - size / 2 + 3, size, size);
 
         // Цвет босса (мигает красным при получении урона)
-        Color bossColor = takingDamage ? Color.WHITE : BOSS_COLOR;
+        Color bossColor = takingDamage ? Color.WHITE : (prepareAbility ? new Color(200, 0, 0) : BOSS_COLOR);
         g2d.setColor(bossColor);
         g2d.fillOval(x - size / 2, y - size / 2, size, size);
 
@@ -231,6 +245,41 @@ public class BossZombie {
         g2d.drawRect(barX, barY, barWidth, barHeight);
     }
 
+    private void drawAttackIndicator(Graphics2D g2d) {
+        long currentTime = System.currentTimeMillis();
+        long timeSinceLastAbility = currentTime - lastAbilityTime;
+        long timeUntilAbility = cooldown - timeSinceLastAbility;
+
+        if (timeUntilAbility > 0 && timeUntilAbility < 500) {
+            boolean flash = (currentTime / 100) % 2 == 0;
+            int alpha = flash ? 150 : 100;
+
+            g2d.setColor(new Color(255, 0, 0, alpha));
+            g2d.setStroke(new BasicStroke(3));
+            g2d.drawOval(x - size / 2 - 10, y - size / 2 - 10, size + 20, size + 20);
+
+            g2d.setColor(new Color(255, 100, 0, alpha / 2));
+            g2d.fillOval(x - size / 2 - 10, y - size / 2 - 10, size + 20, size + 20);
+        }
+    }
+
+    private void drawTargetLine(Graphics2D g2d, int targetX, int targetY, long timeSinceTarget) {
+        double alpha = 1.0 - (double) timeSinceTarget / 1500.0;
+        alpha = Math.max(0.0, Math.min(1.0, alpha));
+
+        int lineAlpha = (int) (150 * alpha);
+        g2d.setColor(new Color(255, 0, 0, lineAlpha));
+        g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[]{5, 5}, 0));
+
+        g2d.drawLine(x, y, targetX, targetY);
+
+        g2d.setColor(new Color(255, 100, 0, lineAlpha / 2));
+        g2d.setStroke(new BasicStroke(1));
+        g2d.drawLine(x, y, targetX, targetY);
+
+        g2d.setStroke(new BasicStroke(1));
+    }
+
     public void takeDamage(int damage) {
         this.health -= damage;
         if (this.health < 0) {
@@ -264,6 +313,12 @@ public class BossZombie {
                         Math.pow(bullet.getY() - y, 2)
         );
         return distance < size / 2 + bullet.getSIZE_OF_BULLET() / 2;
+    }
+
+    public boolean isPrepareAbility() {
+        long time = System.currentTimeMillis();
+        long time2 = time - lastAbilityTime;
+        return time2 > cooldown - 500;
     }
 
     public int getLevel() {

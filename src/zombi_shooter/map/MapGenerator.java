@@ -1,5 +1,7 @@
 package zombi_shooter.map;
 
+import zombi_shooter.enemy.LocationType;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -7,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MapGenerator {
-    private static final Color GRASS_COLOR = new Color(0, 150, 0);
+    private static Color GRASS_COLOR = new Color(0, 150, 0);
     private static final Color DARK_GRASS_COLOR = new Color(0, 100, 0);
     private static final Color ROAD_COLOR = new Color(50, 50, 50);
     private static final Color TREE_COLOR = new Color(45, 255, 0);
@@ -21,17 +23,32 @@ public class MapGenerator {
     private List<Point> trees;
     private List<Point> rocks;
 
-    public MapGenerator(int mapWidth, int mapHeight) {
+    public MapGenerator(int mapWidth, int mapHeight, int level) {
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.random = new Random();
         this.roads = new ArrayList<>();
         this.trees = new ArrayList<>();
         this.rocks = new ArrayList<>();
-        generateMap();
+        generateMap(level);
     }
 
-    public void drawGrassBackground(Graphics2D g2d) {
+    public void drawGrassBackground(Graphics2D g2d, int level) {
+        switch (level){
+            case 1:
+                GRASS_COLOR = LocationType.CITY.getColor();
+                break;
+            case 2:
+                GRASS_COLOR = LocationType.SWAMP.getColor();
+                break;
+            case 3:
+                GRASS_COLOR = LocationType.VULCAN.getColor();
+            case 4:
+                GRASS_COLOR = LocationType.DESERT.getColor();
+                break;
+            default:
+                GRASS_COLOR = LocationType.DESERT.getColor();
+        }
         GradientPaint gradient = new GradientPaint(0, 0, GRASS_COLOR, mapWidth, mapHeight, DARK_GRASS_COLOR);
         g2d.setPaint(gradient);
         g2d.fillRect(0, 0, mapWidth, mapHeight);
@@ -164,11 +181,11 @@ public class MapGenerator {
         }
     }
 
-    public void generateMap() {
+    public void generateMap(int level) {
         mapImage = new BufferedImage(mapWidth, mapHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = mapImage.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        drawGrassBackground(g2d);
+        drawGrassBackground(g2d, level);
         addGrassVariation(g2d);
         generateRoads(g2d);
         generateRocks(g2d);

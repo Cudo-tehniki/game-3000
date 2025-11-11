@@ -28,7 +28,7 @@ public class BossAbility {
         this.isActive = true;
         this.dmg = dmg;
         this.startTime = (int) System.currentTimeMillis();
-        this.warningDuracion = 800;
+        this.warningDuracion = 2500;
         this.isWarning = true;
         this.animationTime = 0;
     }
@@ -56,7 +56,71 @@ public class BossAbility {
     public void draw(Graphics2D g2d) {
         if (!isActive) return;
 
-        int alpha = (int) (255 * (1.0 - (double) (System.currentTimeMillis() - startTime) / duration));
+        long currentTime = System.currentTimeMillis();
+        long timePassed = currentTime - startTime;
+
+        if (isWarning) {
+            drawWarningPhase(g2d, timePassed);
+        } else {
+            drawActivePhase(g2d, timePassed);
+        }
+    }
+
+    private void drawWarningPhase(Graphics2D g2d, long timePassed) {
+        double progress = Math.min(1.0, (double) timePassed / warningDuracion);
+        int warningRadius = (int) (radius * progress);
+
+        boolean flash = (timePassed / 300) % 2 == 0;
+        int alpha = flash ? 200 : 160;
+
+        Color warningColor = new Color(255, 0, 0, alpha);
+        g2d.setColor(warningColor);
+        g2d.setStroke(new BasicStroke(5));
+        g2d.drawOval(x - warningRadius, y - warningRadius, warningRadius * 2, warningRadius * 2);
+
+        RadialGradientPaint gradient = new RadialGradientPaint(
+                x, y, warningRadius,
+                new float[]{0.0f, 0.7f, 1.0f},
+                new Color[]{
+                        new Color(255, 0, 0, alpha / 2),
+                        new Color(255, 100, 0, alpha / 3),
+                        new Color(255, 0, 0, 0)
+                }
+        );
+        g2d.setPaint(gradient);
+        g2d.fillOval(x - warningRadius, y - warningRadius, warningRadius * 2, warningRadius * 2);
+
+        int timeLeft = (int) ((warningDuracion - timePassed) / 1000) + 1;
+        if (timeLeft > 0) {
+            g2d.setColor(new Color(255, 255, 255, 255));
+            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+            FontMetrics fm = g2d.getFontMetrics();
+            String warningText = "⚠ " + type.getName().toUpperCase() + " ⚠";
+            int textX = x - fm.stringWidth(warningText) / 2;
+            int textY = y - warningRadius - 20;
+
+            g2d.setColor(new Color(0, 0, 0, 200));
+            g2d.fillRect(textX - 5, textY - fm.getAscent() - 2, fm.stringWidth(warningText) + 10, fm.getHeight() + 4);
+
+            g2d.setColor(Color.WHITE);
+            g2d.drawString(warningText, textX, textY);
+
+            String timeText = timeLeft + "s";
+            fm = g2d.getFontMetrics();
+            textX = x - fm.stringWidth(timeText) / 2;
+
+            g2d.setColor(new Color(0, 0, 0, 200));
+            g2d.fillRect(textX - 5, y - fm.getAscent() + 3, fm.stringWidth(timeText) + 10, fm.getHeight() + 4);
+
+            g2d.setColor(new Color(255, 255, 0, 255));
+            g2d.drawString(timeText, textX, y + 10);
+        }
+    }
+
+
+    private void drawActivePhase(Graphics2D g2d, long timePassed) {
+        long activeTime = timePassed - warningDuracion;
+        int alpha = (int) (255 * (1.0 - (double) activeTime / duration));
         alpha = Math.max(0, Math.min(255, alpha));
 
         Color effectColor = new Color(
@@ -67,19 +131,23 @@ public class BossAbility {
         );
 
         g2d.setColor(effectColor);
-        g2d.setStroke(new BasicStroke(3));
+        g2d.setStroke(new BasicStroke(5));
         g2d.drawOval(x - radius, y - radius, radius * 2, radius * 2);
 
         RadialGradientPaint gradient = new RadialGradientPaint(
                 x, y, radius,
-                new float[]{0.0f, 1.0f},
-                new Color[]{effectColor, new Color(effectColor.getRed(), effectColor.getGreen(), effectColor.getBlue(), 0)}
+                new float[]{0.0f, 0.5f, 1.0f},
+                new Color[]{
+                        effectColor,
+                        new Color(effectColor.getRed(), effectColor.getGreen(), effectColor.getBlue(), alpha / 2),
+                        new Color(effectColor.getRed(), effectColor.getGreen(), effectColor.getBlue(), 0)
+                }
         );
         g2d.setPaint(gradient);
         g2d.fillOval(x - radius, y - radius, radius * 2, radius * 2);
 
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 12));
+        g2d.setColor(new Color(255, 255, 255, alpha));
+        g2d.setFont(new Font("Arial", Font.BOLD, 14));
         FontMetrics fm = g2d.getFontMetrics();
         int textX = x - fm.stringWidth(type.getName()) / 2;
         int textY = y - radius - 10;
@@ -87,7 +155,7 @@ public class BossAbility {
     }
 
     public boolean isPlayerHit(int pX, int pY, int pSize) {
-        if (!isActive) {
+        if (!isActive || isWarning) {
             return false;
         }
         double distance = Math.sqrt(Math.pow(pX - x, 2) + Math.pow(pY - y, 2));
