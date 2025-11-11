@@ -14,6 +14,10 @@ public class BossAbility {
     private boolean isActive;
     private int dmg;
     private int startTime;
+    private int warningDuracion;
+    private boolean isWarning;
+    private double animationTime;
+
 
     public BossAbility(AbilityType type, int x, int y, int dmg) {
         this.type = type;
@@ -24,14 +28,29 @@ public class BossAbility {
         this.isActive = true;
         this.dmg = dmg;
         this.startTime = (int) System.currentTimeMillis();
+        this.warningDuracion = 800;
+        this.isWarning = true;
+        this.animationTime = 0;
     }
 
+
     public void update() {
-        if (System.currentTimeMillis() - startTime > duration) {
+        long currentTime = System.currentTimeMillis();
+        long timePassed = currentTime - startTime;
+        if(timePassed >= warningDuracion){
+            isWarning = false;
+            isActive = true;
+            long activeTime = timePassed - warningDuracion;
+            if(activeTime > duration){
+                isActive = false;
+            }
+            radius = (int) (80 + (timePassed / 25));
+        } else {
+            isWarning = true;
             isActive = false;
+            long progress = timePassed / warningDuracion;
+            radius = (int) (50 + (progress * 30));
         }
-        long timePassed = System.currentTimeMillis() - startTime;
-        radius = (int) (50 + (timePassed / 20));
     }
 
     public void draw(Graphics2D g2d) {

@@ -204,7 +204,7 @@ public class Zomboid {
         int woundSize = Math.max(4, size / 8);
         g2d.fillOval(bodyX - bodyWidth / 3, bodyY + bodyHeight / 4, woundSize, woundSize);
         g2d.fillOval(bodyX + bodyWidth / 4, bodyY + bodyHeight / 2, woundSize, woundSize);
-        g2d.fillOval(bodyX - bodyWidth / 6, bodyY + bodyHeight * 0.7, woundSize, woundSize);
+        g2d.fillOval(bodyX - bodyWidth / 6, (int) (bodyY + bodyHeight * 0.7), woundSize, woundSize);
         g2d.fillOval(bodyX + bodyWidth / 3, bodyY + bodyHeight / 3, woundSize, woundSize);
         
         g2d.rotate(-bodySway * 0.08);
@@ -224,7 +224,7 @@ public class Zomboid {
         g2d.fillOval(headX - eyeSpacing - pupilSize / 2 + pupilOffset, eyeY, pupilSize, pupilSize);
         g2d.fillOval(headX + eyeSpacing - pupilSize / 2 + pupilOffset, eyeY, pupilSize, pupilSize);
         
-        int mouthY = headY + headSize * 0.65;
+        int mouthY = (int) (headY + headSize * 0.65);
         int mouthWidth = (int)(size * 0.35);
         int mouthHeight = size / 8;
         

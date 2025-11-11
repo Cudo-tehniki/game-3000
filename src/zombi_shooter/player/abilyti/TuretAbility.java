@@ -12,7 +12,7 @@ public class TuretAbility implements Ability {
 
     private static final String NAME = "Turret";
     private static final String DESCRIPTION = "спавнит турель";
-    private static final long COUDOWN_TIME = 40000;
+    private static final long COUDOWN_TIME = 1000;
     private static final long TIME_DURACION = 20000;
     private static final long TURRET_RANGE = 200;
     private static final int DMG = 3;
