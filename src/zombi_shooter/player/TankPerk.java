@@ -4,7 +4,7 @@ import java.awt.*;
 
 public class TankPerk extends Perk{
     public TankPerk() {
-        super("Tank", "Джагернаут", "HP +100%", "Speed -20%", new Color(115, 115, 115), "🛡️", "turret");
+        super("Tank", "Джагернаут", "HP +100%", "Speed -20%", new Color(115, 115, 115), "🛡️", "turret", "robot");
     }
 
     @Override

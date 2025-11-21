@@ -23,6 +23,7 @@ public class AbilityManager {
         this.abilities = new HashMap<>();
         this.activeAbility = new ArrayList<>();
         abilities.put("turret", new TuretAbility());
+        abilities.put("robot", new RobotAbility());
     }
 
     public boolean addAbility(String idAbility) {
@@ -71,6 +72,11 @@ public class AbilityManager {
                 if (turret.isPlaced()) {
                     choosenAbility = null;
                 }
+            } else if (activate && choosenAbility instanceof RobotAbility) {
+                RobotAbility robot = (RobotAbility) choosenAbility;
+                if (robot.isPlaced()){
+                    choosenAbility = null;
+                }
             } else if (activate) {
                 choosenAbility = null;
             }
@@ -115,12 +121,18 @@ public class AbilityManager {
                     turret.resetForCooldown(); // Новый метод для сброса состояния
                 }
             }
+            if (a instanceof RobotAbility){
+                RobotAbility robot = (RobotAbility) a;
+                if (robot.isPlaced() && !robot.isActive()){
+                    //robot.cleanUp();
+                }
+            }
         }
         // Больше не удаляем турели автоматически - они остаются для показа кулдауна
     }
 
-    public void draw(Graphics2D graphics2D){
-        for(Ability a: activeAbility){
+    public void draw(Graphics2D graphics2D) {
+        for (Ability a : activeAbility) {
             if (a == choosenAbility && a.isActive() && !placed(a)) {
                 a.draw(graphics2D, mousePosicion.x, mousePosicion.y);
             } else {
@@ -128,12 +140,16 @@ public class AbilityManager {
             }
         }
     }
-    
+
     private boolean placed(Ability ability) {
         if (ability instanceof TuretAbility) {
             TuretAbility turret = (TuretAbility) ability;
             // Нужно добавить геттер для placed в TuretAbility
             return turret.isPlaced();
+        }
+        if (ability instanceof RobotAbility) {
+            RobotAbility robot = (RobotAbility) ability;
+            return robot.isPlaced();
         }
         return true; // для других способностей считаем размещенными
     }
@@ -234,15 +250,15 @@ public class AbilityManager {
         }
     }
 
-    public boolean isActiveAbility(){
-        if(!activeAbility.isEmpty()){
+    public boolean isActiveAbility() {
+        if (!activeAbility.isEmpty()) {
             return true;
         }
         return false;
     }
 
-    public void cleanUp(){
-        for (Ability a: activeAbility){
+    public void cleanUp() {
+        for (Ability a : activeAbility) {
             a.cleanUp();
         }
         activeAbility.clear();
@@ -265,10 +281,11 @@ public class AbilityManager {
         this.choosenAbility = choosenAbility;
     }
 
-    public void updatePlayerPosicion(int x, int y){
+    public void updatePlayerPosicion(int x, int y) {
         playerPosicion.setLocation(x, y);
     }
-    public void updateMousePosicion(int x, int y){
+
+    public void updateMousePosicion(int x, int y) {
         mousePosicion.setLocation(x, y);
     }
 }

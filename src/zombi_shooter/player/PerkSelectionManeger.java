@@ -48,11 +48,17 @@ public class PerkSelectionManeger {
     }
 
     private void acceptAbility(Perk selected) {
-        if(selected.hasAbility() && abilityManager != null){
+        System.out.println("acceptAbility called for perk: " + (selected != null ? selected.getName() : "null"));
+        System.out.println("abilityManager is null: " + (abilityManager == null));
+        System.out.println("selected.hasAbility(): " + (selected != null && selected.hasAbility()));
+        if(selected != null && selected.hasAbility() && abilityManager != null){
+            System.out.println("Adding abilities: " + selected.getAbilityKeys());
             for(String k: selected.getAbilityKeys()){
                 boolean added = abilityManager.addAbility(k);
                 System.out.println("Added ability: " + k + ", success: " + added);
             }
+        } else {
+            System.out.println("Failed to add abilities - selected: " + (selected != null) + ", hasAbility: " + (selected != null && selected.hasAbility()) + ", abilityManager: " + (abilityManager != null));
         }
     }
 

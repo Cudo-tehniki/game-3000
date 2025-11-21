@@ -1,10 +1,10 @@
 package zombi_shooter;
 
+import zombi_shooter.enemy.EnemyType;
 import zombi_shooter.map.MapGenerator;
 import zombi_shooter.map.MiniMap;
 import zombi_shooter.player.*;
 import zombi_shooter.player.abilyti.AbilityManager;
-import zombi_shooter.enemy.EnemyType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,8 +40,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     private boolean hordWarning = false;
     private long hordWarningTime = 0;
     private int HORDE_DURACION = 0;
-    private String[] duracionName = { "", "сверху", "справа", "снизу", "слева" };
-    private String[] arrowsDuracion = { "", "⬆️", "➡️", "⬇️", "⬅️" };
+    private String[] duracionName = {"", "сверху", "справа", "снизу", "слева"};
+    private String[] arrowsDuracion = {"", "⬆️", "➡️", "⬇️", "⬅️"};
     private Player player;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -86,7 +86,22 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         init();
     }
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            ZombieGame zombieGame = new ZombieGame();
+            JFrame map = new JFrame("Zombie game 3000");
+            map.getContentPane().setBackground(BACKGROUND);
+            map.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            map.setResizable(false);
+            map.setLocation(100, 50);
+            map.add(zombieGame);
+            map.pack();
+            map.setVisible(true);
+        });
+    }
+
     private void init() {
+        abilityManager = new AbilityManager();
         perkSelectionManeger = new PerkSelectionManeger();
         perkSelectionManeger.setAbilityManager(abilityManager);
         perkSelectionManeger.startSelectionRandomPerk();
@@ -127,23 +142,8 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         sound.playBackgroudMusic("background");
 
 
-
         timer = new Timer(1000 / 60, this);
         timer.start();
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            ZombieGame zombieGame = new ZombieGame();
-            JFrame map = new JFrame("Zombie game 3000");
-            map.getContentPane().setBackground(BACKGROUND);
-            map.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            map.setResizable(false);
-            map.setLocation(100, 50);
-            map.add(zombieGame);
-            map.pack();
-            map.setVisible(true);
-        });
     }
 
     @Override
@@ -178,7 +178,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
 
         // Рисуем UI поверх всего
         drawUI(g2d);
-        if(gameRunning){
+        if (gameRunning) {
             miniMap.draw(g2d, listOfZomboits, listOfChests, player, boss, bossActive);
         }
     }
@@ -305,7 +305,6 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
 
         drawAchievementNotification(g2d);
     }
-
 
 
     private void drawHordeWarning(Graphics2D g2d, long timeLeft) {
@@ -461,23 +460,23 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         switch (HORDE_DURACION) {
             case 1: // Сверху
                 g2d.drawLine(centerX, centerY - size + 5, centerX, centerY - 8);
-                g2d.fillPolygon(new int[] { centerX - 3, centerX + 3, centerX },
-                        new int[] { centerY - 5, centerY - 5, centerY - 8 }, 3);
+                g2d.fillPolygon(new int[]{centerX - 3, centerX + 3, centerX},
+                        new int[]{centerY - 5, centerY - 5, centerY - 8}, 3);
                 break;
             case 2: // Справа
                 g2d.drawLine(centerX + size - 5, centerY, centerX + 8, centerY);
-                g2d.fillPolygon(new int[] { centerX + 5, centerX + 5, centerX + 8 },
-                        new int[] { centerY - 3, centerY + 3, centerY }, 3);
+                g2d.fillPolygon(new int[]{centerX + 5, centerX + 5, centerX + 8},
+                        new int[]{centerY - 3, centerY + 3, centerY}, 3);
                 break;
             case 3: // Снизу
                 g2d.drawLine(centerX, centerY + size - 5, centerX, centerY + 8);
-                g2d.fillPolygon(new int[] { centerX - 3, centerX + 3, centerX },
-                        new int[] { centerY + 5, centerY + 5, centerY + 8 }, 3);
+                g2d.fillPolygon(new int[]{centerX - 3, centerX + 3, centerX},
+                        new int[]{centerY + 5, centerY + 5, centerY + 8}, 3);
                 break;
             case 4: // Слева
                 g2d.drawLine(centerX - size + 5, centerY, centerX - 8, centerY);
-                g2d.fillPolygon(new int[] { centerX - 5, centerX - 5, centerX - 8 },
-                        new int[] { centerY - 3, centerY + 3, centerY }, 3);
+                g2d.fillPolygon(new int[]{centerX - 5, centerX - 5, centerX - 8},
+                        new int[]{centerY - 3, centerY + 3, centerY}, 3);
                 break;
         }
 
@@ -642,14 +641,14 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         // НОВОЕ: Обновляем босса или обычных зомби
         if (bossActive && boss != null) {
             boss.update(player.getPositionX(), player.getPositionY());
-            if(boss.isPlayerHit(player.getPositionX(), player.getPositionY(), player.getSize())){
+            if (boss.isPlayerHit(player.getPositionX(), player.getPositionY(), player.getSize())) {
                 player.setPlayerHealth(player.getPlayerHealth() - boss.getAbilityDmg());
             }
         } else {
             updateZombi();
         }
 
-        if(player.getPlayerHealth() <= 0){
+        if (player.getPlayerHealth() <= 0) {
             gameRunning = false;
         }
 
@@ -875,8 +874,20 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
     }
 
     private void updateZombi() {
-        for (Zomboid zomb : listOfZomboits) {
-            zomb.update(player.getPositionX(), player.getPositionY());
+        Iterator<Zomboid> zomboidIterator = listOfZomboits.iterator();
+        while (zomboidIterator.hasNext()) {
+            Zomboid next = zomboidIterator.next();
+            if (next.isDead()) {
+                zomboidIterator.remove();
+                score += 10;
+                zombiesKilled++;
+                if (perkSelectionManeger.getSelectedPerk() instanceof RedKlinokPerk) {
+                    player.setPlayerHealth(Math.min(player.getMaxHealth(), player.getPlayerHealth() + 1));
+
+                }
+            } else {
+                next.update(player.getPositionX(), player.getPositionY());
+            }
         }
     }
 
@@ -1082,7 +1093,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         perkSelectionManeger.startSelectionRandomPerk();
 
         // Сбрасываем AbilityManager и устанавливаем связь
-        abilityManager.cleanUp();
+        //abilityManager.cleanUp();
         perkSelectionManeger.setAbilityManager(abilityManager);
         miniMap = new MiniMap(MAP_WIDTH, MAP_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, mapGenerator);
 
