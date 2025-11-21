@@ -5,7 +5,7 @@ import java.awt.*;
 public class ScoutPerk extends  Perk{
 
     public ScoutPerk() {
-        super("Light", "Бегун", "Speed +50%", "HP -50%", new Color(0, 224, 255), "👟", "turret");
+        super("Light", "Бегун", "Speed +50%", "HP -50%", new Color(0, 224, 255), "👟", "turret", "robot");
     }
 
     @Override

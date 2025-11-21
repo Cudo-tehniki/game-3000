@@ -113,7 +113,6 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         mapGenerator = new MapGenerator(MAP_WIDTH, MAP_HEIGHT, currentLevel);
         miniMap = new MiniMap(MAP_WIDTH, MAP_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, mapGenerator);
         currentWeapon = new Weapon(Weapon.WeaponType.PISTOL);
-        abilityManager = new AbilityManager();
 
         setFocusable(true);
         addKeyListener(this);
@@ -136,11 +135,7 @@ public class ZombieGame extends JPanel implements KeyListener, ActionListener, M
         initAchievement();
 
         sound = new Sound();
-        sound.loadSound("background", "C:\\project_java\\megaGame3000\\src\\zombi_shooter\\music\\backgroundByCudoTehniki.wav");
-        sound.loadSound("hitZomb", "C:\\project_java\\Test 234\\Test 234\\Test 234\\src\\zombi_shooter\\music\\hit.wav");
-        sound.loadSound("shoot", "C:\\project_java\\Test 234\\Test 234\\Test 234\\src\\zombi_shooter\\music\\shoot.wav");
-        sound.playBackgroudMusic("background");
-
+       
 
         timer = new Timer(1000 / 60, this);
         timer.start();
